@@ -10,7 +10,8 @@ router.post("/", async (req, res) => {
     if (data.Plot.PlotID !== 'ALL') {
         objectToPush.farmerId = data.Farmer.FarmerID;
         objectToPush.plot = data.Plot.PlotID;
-        await fetch("https://secure-bastion-17136.herokuapp.com/farmers/" + objectToPush.farmerId + "?personalInformation.GCN=1", {
+        objectToPush.MHCode = "123";
+        await fetch("https://secure-bastion-17136.herokuapp.com/farmers/" + objectToPush.farmerId + "?personalInformation.GGN=1", {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -24,10 +25,10 @@ router.post("/", async (req, res) => {
                     throw Error("Error while inserting diary");
             })
             .then((result) => {
-                objectToPush.GCN = result.personalInformation.GCN;
+                objectToPush.GGN = result.personalInformation.GGN;
             })
             .catch((err) => {
-                res.status(400).send(err.message);
+                // res.status(400).send(err.message);
             });
         console.log("object", objectToPush);
         fetch('https://secure-bastion-17136.herokuapp.com/dailyDiary', {
@@ -72,8 +73,8 @@ router.post("/", async (req, res) => {
             })
             .then((result) => {
                 if (result.personalInformation.name.trim() === result.personalInformation.familyName.trim()) {
-                    const gcnKey = result.personalInformation.GCN;
-                    fetch("https://secure-bastion-17136.herokuapp.com/farmers/GCN/" + gcnKey + "?_id=1&plots.farmInformation=1", {
+                    const gcnKey = result.personalInformation.GGN;
+                    fetch("https://secure-bastion-17136.herokuapp.com/farmers/GGN/" + gcnKey + "?_id=1&plots.farmInformation=1", {
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json',
@@ -89,7 +90,7 @@ router.post("/", async (req, res) => {
                         .then((result) => {
                             for (let i = 0; i < result.length; i++) {
                                 objectToPush.farmerId = result[i]._id;
-                                objectToPush.GCN = gcnKey;
+                                objectToPush.GGN = gcnKey;
                                 for (let j = 0; j < result[i].plots.length; j++) {
                                     objectToPush.plot = result[i].plots[j].farmInformation.plotNumber;
                                     fetch('https://secure-bastion-17136.herokuapp.com/dailyDiary', {
@@ -127,7 +128,7 @@ router.post("/", async (req, res) => {
                         });
                 } else {
                     objectToPush.farmerId = result._id;
-                    objectToPush.GCN = result.personalInformation.GCN;
+                    objectToPush.GGN = result.personalInformation.GGN;
                     const plots = result.plots;
                     const objectArrayToPush = [];
                     for (let i = 0; i < plots.length; i++) {
@@ -249,19 +250,19 @@ function generateObjectFromData(data) {
             details: arr,
         }
     }
-    const maintainanceworkData = data.Maintenance;
-    if (maintainanceworkData) {
+    const maintenanceworkData = data.Maintenance;
+    if (maintenanceworkData) {
         const arr = [];
         for (let i = 1; i <= 5; i++) {
             const workDetails = {};
-            if (!maintainanceworkData["row" + i].MaintenanceWork)
+            if (!maintenanceworkData["row" + i].MaintenanceWork)
                 continue;
-            workDetails.item = maintainanceworkData["row" + i].MaintenanceWork;
-            workDetails.comments = maintainanceworkData["row" + i].Details;
-            workDetails.imageUrl = maintainanceworkData["row" + i].ImageLink;
+            workDetails.item = maintenanceworkData["row" + i].MaintenanceWork;
+            workDetails.comments = maintenanceworkData["row" + i].Details;
+            workDetails.imageUrl = maintenanceworkData["row" + i].ImageLink;
             arr.push(workDetails);
         }
-        objectToPush.maintainanceWork = {
+        objectToPush.maintenanceWork = {
             details: arr,
         }
     }

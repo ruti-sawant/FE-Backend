@@ -47,11 +47,11 @@ export default router;
 
 //supportive functions
 function getPlotsForHead(result, i) {
-    const gcnKey = result[i].personalInformation.GCN;
+    const gcnKey = result[i].personalInformation.GGN;
     const resultLength = result.length;
     const resultantArray = [];
     for (let j = 0; j < resultLength; j++) {
-        if (result[j].personalInformation.GCN === gcnKey) {
+        if (result[j].personalInformation.GGN === gcnKey) {
             const plots = getPlots(result, j);
             for (let k = 0; k < plots.length; k++)
                 resultantArray.push(plots[k]);

@@ -20,11 +20,12 @@ app.use(express.json());
 import uploadFile from './routes/uploadFile.js';
 import farmers from './routes/farmers.js';
 import dailyDiary from './routes/dailyDiary.js';
+import bulkUpload from './routes/bulkUpload.js';
 
 app.use("/uploadFile", uploadFile);
 app.use("/farmers", farmers);
 app.use("/dailyDiary", dailyDiary);
-
+app.use("/bulkUpload", bulkUpload);
 
 const port = process.env.PORT || 3000;
 
