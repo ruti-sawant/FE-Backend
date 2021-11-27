@@ -51,11 +51,9 @@ router.get("/", (req, res) => {
         }
     })
         .then((data) => {
-            console.log(data.data);
             res.status(200).send(data.data);
         })
         .catch((err) => {
-            console.log(err);
             res.status(400).send({ message: err.message });
         });
 });
@@ -76,6 +74,23 @@ router.get("/data/:farmerId", (req, res) => {
             res.status(400).send({ message: err.message });
         });
 });
+
+
+router.get("/MHCode/:MHCode", (req, res) => {
+    const MHCode = req.params.MHCode;
+    axios.get("https://secure-bastion-17136.herokuapp.com/farmers/MHCode/" + MHCode, {
+        headers: {
+            'Content-Type': 'application/json',
+            'apiid': process.env.API_KEY
+        }
+    })
+        .then((data) => {
+            res.status(200).send(data.data);
+        })
+        .catch((err) => {
+            res.status(400).send({ message: err.message });
+        });
+})
 
 export default router;
 

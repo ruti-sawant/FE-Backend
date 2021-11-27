@@ -4,14 +4,13 @@ const router = express.Router();
 
 
 router.post("/", async (req, res) => {
-    console.log(req.body.data);
+    // console.log(req.body.data);
     const data = req.body.data;
     const objectToPush = generateObjectFromData(data);
     if (data.Plot.PlotID !== 'ALL') {
         objectToPush.farmerId = data.Farmer.FarmerID;
         objectToPush.plot = data.Plot.PlotID;
-        objectToPush.MHCode = "123";
-        await fetch("https://secure-bastion-17136.herokuapp.com/farmers/" + objectToPush.farmerId + "?personalInformation.GGN=1", {
+        await fetch("https://secure-bastion-17136.herokuapp.com/farmers/" + objectToPush.farmerId + "?personalInformation.GGN=1&plots.farmInformation.plotNumber=1&plots.farmInformation.MHCode=1", {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -26,6 +25,15 @@ router.post("/", async (req, res) => {
             })
             .then((result) => {
                 objectToPush.GGN = result.personalInformation.GGN;
+                objectToPush.MHCode = "";
+                const plots = result.plots;
+                for (let i = 0; i < plots.length; i++) {
+                    console.log(i, plots[i]);
+                    if (plots[i].farmInformation.plotNumber === objectToPush.plot) {
+                        objectToPush.MHCode = plots[i].farmInformation.MHCode;
+                        break;
+                    }
+                }
             })
             .catch((err) => {
                 res.status(400).send(err.message);
@@ -93,6 +101,7 @@ router.post("/", async (req, res) => {
                                 objectToPush.GGN = gcnKey;
                                 for (let j = 0; j < result[i].plots.length; j++) {
                                     objectToPush.plot = result[i].plots[j].farmInformation.plotNumber;
+                                    objectToPush.MHCode = result[i].plots[j].farmInformation.MHCode;
                                     fetch('https://secure-bastion-17136.herokuapp.com/dailyDiary', {
                                         method: 'POST',
                                         headers: {
@@ -133,6 +142,7 @@ router.post("/", async (req, res) => {
                     const objectArrayToPush = [];
                     for (let i = 0; i < plots.length; i++) {
                         objectToPush.plot = plots[i].farmInformation.plotNumber;
+                        objectToPush.MHCode = plots[i].farmInformation.MHCode;
                         // const tempObjectToPush = objectToPush;
                         // tempObjectToPush.plot = plots[i].farmInformation.plotNumber;
                         // objectArrayToPush.push(tempObjectToPush);
