@@ -3,6 +3,7 @@ import fetch from 'node-fetch';
 import axios from 'axios';
 const router = express.Router();
 
+// /farmers/plots
 router.get("/plots", (req, res) => {
     fetch('https://secure-bastion-17136.herokuapp.com/farmers?personalInformation=1&plots.farmInformation=1', {
         method: 'GET',
@@ -55,6 +56,23 @@ router.get("/", (req, res) => {
         })
         .catch((err) => {
             console.log(err);
+            res.status(400).send({ message: err.message });
+        });
+});
+
+// /farmers/data/{farmerId}
+router.get("/data/:farmerId", (req, res) => {
+    const farmerId = req.params.farmerId;
+    axios.get("https://secure-bastion-17136.herokuapp.com/farmers/" + farmerId, {
+        headers: {
+            'Content-Type': 'application/json',
+            'apiid': process.env.API_KEY
+        }
+    })
+        .then((data) => {
+            res.status(200).send(data.data);
+        })
+        .catch((err) => {
             res.status(400).send({ message: err.message });
         });
 });

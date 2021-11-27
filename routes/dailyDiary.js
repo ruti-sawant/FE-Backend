@@ -28,7 +28,7 @@ router.post("/", async (req, res) => {
                 objectToPush.GGN = result.personalInformation.GGN;
             })
             .catch((err) => {
-                // res.status(400).send(err.message);
+                res.status(400).send(err.message);
             });
         console.log("object", objectToPush);
         fetch('https://secure-bastion-17136.herokuapp.com/dailyDiary', {
