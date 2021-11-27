@@ -1,9 +1,10 @@
 import express from 'express';
 import fetch from 'node-fetch';
+import axios from 'axios';
 const router = express.Router();
 
-router.get("/", (req, res) => {
-    fetch('https://secure-bastion-17136.herokuapp.com/farmers', {
+router.get("/plots", (req, res) => {
+    fetch('https://secure-bastion-17136.herokuapp.com/farmers?personalInformation=1&plots.farmInformation=1', {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -41,6 +42,22 @@ router.get("/", (req, res) => {
         });
 });
 
+router.get("/", (req, res) => {
+    axios.get("https://secure-bastion-17136.herokuapp.com/farmers", {
+        headers: {
+            'Content-Type': 'application/json',
+            'apiid': process.env.API_KEY
+        }
+    })
+        .then((data) => {
+            console.log(data.data);
+            res.status(200).send(data.data);
+        })
+        .catch((err) => {
+            console.log(err);
+            res.status(400).send({ message: err.message });
+        });
+});
 
 export default router;
 
