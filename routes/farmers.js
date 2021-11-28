@@ -119,7 +119,7 @@ router.post("/plots/edit/:plotId", (req, res) => {
     const plotId = req.params.plotId;
     const data = req.body;
     console.log("plots patch body", data);
-    axios.patch("http://localhost:5000/farmers/plots/" + plotId, {
+    axios.patch("https://secure-bastion-17136.herokuapp.com/farmers/plots/" + plotId, {
         data
     }, {
         headers: {
