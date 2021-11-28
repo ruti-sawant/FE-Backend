@@ -118,7 +118,8 @@ function getPlots(result, i) {
         resultantArray.push({
             plot: plotsArray[j].farmInformation.plotNumber,
             farmerId: result[i]._id,
-            farmerName: result[i].personalInformation.name
+            farmerName: result[i].personalInformation.name,
+            MHCode: plotsArray[j].farmInformation.MHCode,
         });
     }
     return resultantArray;
