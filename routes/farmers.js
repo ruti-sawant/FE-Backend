@@ -95,7 +95,7 @@ router.get("/MHCode/:MHCode", (req, res) => {
 
 router.post("/edit/:farmerId", (req, res) => {
     const farmerId = req.params.farmerId;
-    const data = req.body.data;
+    const data = req.body;
     console.log("body", req.body);
     console.log(data);
     axios.patch("https://secure-bastion-17136.herokuapp.com/farmers/" + farmerId, { data }, {
