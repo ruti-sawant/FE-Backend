@@ -113,7 +113,31 @@ router.post("/edit/:farmerId", (req, res) => {
 
             res.status(400).send({ message: err.message });
         });
-})
+});
+
+router.post("/plots/edit/:plotId", (req, res) => {
+    const plotId = req.params.plotId;
+    const data = req.body;
+    console.log("plots patch body", data);
+    axios.patch("http://localhost:5000/farmers/plots/" + plotId, {
+        data
+    }, {
+        headers: {
+            'Content-Type': 'application/json',
+            'apiid': process.env.API_KEY
+        }
+    })
+        .then((data) => {
+            console.log("plots patch then", data);
+            res.status(200).send({ message: "Farmer updated successfully" });
+        })
+        .catch((err) => {
+            console.log("plots patch err", err);
+            res.status(400).send({ message: err.message });
+        });
+});
+
+
 export default router;
 
 
