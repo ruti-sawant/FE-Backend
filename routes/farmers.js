@@ -92,6 +92,26 @@ router.get("/MHCode/:MHCode", (req, res) => {
         });
 })
 
+
+router.post("/edit/:farmerId", (req, res) => {
+    const farmerId = req.params.farmerId;
+    const data = req.body.data;
+    console.log(data);
+    axios.patch("https://secure-bastion-17136.herokuapp.com/farmers/" + farmerId, { data }, {
+        headers: {
+            'Content-Type': 'application/json',
+            'apiid': process.env.API_KEY
+        }
+    })
+        .then((data) => {
+            res.status(200).send({ message: "Farmer updated successfully" });
+        })
+        .catch((err) => {
+            // console.log(err);
+
+            res.status(400).send({ message: err.message });
+        });
+})
 export default router;
 
 
