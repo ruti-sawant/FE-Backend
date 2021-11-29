@@ -1,6 +1,7 @@
 import express from "express";
 import fileUpload from "express-fileupload";
 import cors from 'cors';
+import axios from "axios";
 const app = express();
 
 
@@ -33,3 +34,18 @@ app.listen(port, () => {
     console.log("Server started on port ", port);
 });
 
+//
+app.get("/filters", (req, res) => {
+    axios.get("https://secure-bastion-17136.herokuapp.com/filters", {
+        headers: {
+            'Content-Type': 'application/json',
+            'apiid': process.env.API_KEY
+        }
+    })
+        .then((data) => {
+            res.status(200).send(data.data);
+        })
+        .catch((err) => {
+            res.status(400).send({ message: err.message });
+        });
+});
