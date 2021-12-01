@@ -22,11 +22,14 @@ import uploadFile from './routes/uploadFile.js';
 import farmers from './routes/farmers.js';
 import dailyDiary from './routes/dailyDiary.js';
 import bulkUpload from './routes/bulkUpload.js';
+import seasonalData from './routes/seasonalData.js';
 
 app.use("/uploadFile", uploadFile);
 app.use("/farmers", farmers);
 app.use("/dailyDiary", dailyDiary);
 app.use("/bulkUpload", bulkUpload);
+app.use("/seasonalData", seasonalData);
+
 
 const port = process.env.PORT || 3000;
 
@@ -34,7 +37,7 @@ app.listen(port, () => {
     console.log("Server started on port ", port);
 });
 
-//
+//route to fetch filters from database.
 app.get("/filters", (req, res) => {
     axios.get("https://secure-bastion-17136.herokuapp.com/filters", {
         headers: {
