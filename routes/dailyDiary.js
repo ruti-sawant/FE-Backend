@@ -2,6 +2,70 @@ import express from 'express';
 import fetch from 'node-fetch';
 const router = express.Router();
 
+import axios from 'axios';
+
+router.get("/", (req, res) => {
+    axios.get("https://secure-bastion-17136.herokuapp.com/dailyDiary", {
+        headers: {
+            'Content-Type': 'application/json',
+            'apiid': process.env.API_KEY
+        }
+    })
+        .then((data) => {
+            res.status(200).send(data.data);
+        })
+        .catch((err) => {
+            res.status(400).send({ message: err.message });
+        });
+});
+
+router.get("/MHCode/:MHCode", (req, res) => {
+    const MHCode = req.params.MHCode;
+    axios.get("https://secure-bastion-17136.herokuapp.com/dailyDiary/MHCode/" + MHCode, {
+        headers: {
+            'Content-Type': 'application/json',
+            'apiid': process.env.API_KEY
+        }
+    })
+        .then((data) => {
+            res.status(200).send(data.data);
+        })
+        .catch((err) => {
+            res.status(400).send({ message: err.message });
+        });
+});
+
+router.get("/farmers/:farmerId", (req, res) => {
+    const farmerID = req.params.farmerId;
+    axios.get("https://secure-bastion-17136.herokuapp.com/dailyDiary/" + farmerID, {
+        headers: {
+            'Content-Type': 'application/json',
+            'apiid': process.env.API_KEY
+        }
+    })
+        .then((data) => {
+            res.status(200).send(data.data);
+        })
+        .catch((err) => {
+            res.status(400).send({ message: err.message });
+        });
+});
+
+router.get("/diary/:diaryId", (req, res) => {
+    const diaryId = req.params.diaryId;
+    axios.get("https://secure-bastion-17136.herokuapp.com/dailyDiary/data/" + diaryId, {
+        headers: {
+            'Content-Type': 'application/json',
+            'apiid': process.env.API_KEY
+        }
+    })
+        .then((data) => {
+            res.status(200).send(data.data);
+        })
+        .catch((err) => {
+            res.status(400).send({ message: err.message });
+        });
+})
 
 router.post("/", async (req, res) => {
     // console.log(req.body.data);
