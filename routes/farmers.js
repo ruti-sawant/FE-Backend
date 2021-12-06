@@ -92,6 +92,47 @@ router.get("/MHCode/:MHCode", (req, res) => {
         });
 })
 
+router.post("/", (req, res) => {
+    const data = req.body;
+    console.log("post farmer body", data);
+    axios.post("https://secure-bastion-17136.herokuapp.com/farmers", {
+        data
+    }, {
+        headers: {
+            'Content-Type': 'application/json',
+            'apiid': process.env.API_KEY
+        }
+    })
+        .then((data) => {
+            res.status(200).send({ message: "Farmer inserted successfully" });
+        })
+        .catch((err) => {
+            console.log(err);
+            res.status(400).send({ message: err.message });
+        });
+});
+
+router.post("/plots/addPlot/:farmerId", (req, res) => {
+    const farmerId = req.params.farmerId;
+    const data = req.body;
+    axios.patch("https://secure-bastion-17136.herokuapp.com/farmers/newPlot/" + farmerId, {
+        data
+    }, {
+        headers: {
+            'Content-Type': 'application/json',
+            'apiid': process.env.API_KEY
+        }
+    })
+        .then((data) => {
+            console.log("data in post of farmer plot insert", data);
+            res.status(200).send({ message: "Farmer plot inserted successfully" });
+        })
+        .catch((err) => {
+            console.log(err);
+
+            res.status(400).send({ message: err.message });
+        });
+});
 
 router.post("/edit/:farmerId", (req, res) => {
     const farmerId = req.params.farmerId;
