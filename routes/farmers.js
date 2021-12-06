@@ -92,42 +92,46 @@ router.get("/MHCode/:MHCode", (req, res) => {
         });
 })
 
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
     const data = req.body;
     console.log("post farmer body", data);
     try {
-        axios.get("https://secure-bastion-17136.herokuapp.com/farmers/GGN/" + data.personalInformation.GGN, {
+        if (data.personalInformation.familyName.trim() === "") {
+            await axios.get("https://secure-bastion-17136.herokuapp.com/farmers/GGN/" + data.personalInformation.GGN, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apiid': process.env.API_KEY
+                }
+            })
+                .then((resData) => {
+                    if (resData.data && resData.data[0]) {
+                        console.log("data from api for GGN", resData.data);
+                        data.personalInformation.familyName = resData.data[0].personalInformation.familyName;
+                    } else {
+                        res.status(400).send({ message: err.message });
+                        return;
+                    }
+                })
+                .catch((err) => {
+                    res.status(400).send({ message: err.message });
+                    return;
+                })
+        }
+        axios.post("https://secure-bastion-17136.herokuapp.com/farmers", {
+            data
+        }, {
             headers: {
                 'Content-Type': 'application/json',
                 'apiid': process.env.API_KEY
             }
         })
-            .then((resData) => {
-                if (resData.data && resData.data[0]) {
-                    console.log("data from api for GGN", resData.data);
-                    data.personalInformation.familyName = resData.data[0].personalInformation.familyName;
-                    axios.post("https://secure-bastion-17136.herokuapp.com/farmers", {
-                        data
-                    }, {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'apiid': process.env.API_KEY
-                        }
-                    })
-                        .then((data) => {
-                            res.status(200).send({ message: "Farmer inserted successfully" });
-                        })
-                        .catch((err) => {
-                            console.log(err);
-                            res.status(400).send({ message: err.message });
-                        });
-                } else {
-                    res.status(400).send({ message: err.message });
-                }
+            .then((data) => {
+                res.status(200).send({ message: "Farmer inserted successfully" });
             })
             .catch((err) => {
+                console.log(err);
                 res.status(400).send({ message: err.message });
-            })
+            });
     } catch (err) {
         res.status(400).send({ message: err.message });
     }
