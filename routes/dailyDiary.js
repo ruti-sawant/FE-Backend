@@ -263,7 +263,7 @@ function generateObjectFromData(data) {
         for (let i = 1; i <= 5; i++) {
             // console.log(sprayingData["row" + i]);
             const sprayDetail = {};
-            if (!(sprayingData["row" + i].SprayingType))
+            if (!(sprayingData["row" + i].SprayingType) || sprayingData["row" + i].SprayingType === "None")
                 continue;
             sprayDetail.category = sprayingData["row" + i].SprayingType;
             sprayDetail.chemical = sprayingData["row" + i].Chemical;
@@ -280,7 +280,7 @@ function generateObjectFromData(data) {
         const arr = [];
         for (let i = 1; i <= 5; i++) {
             const fertilizerDetail = {};
-            if (!(fertilizerData["row" + i].FertilizerWork))
+            if (!(fertilizerData["row" + i].FertilizerWork) || fertilizerData["row" + i].FertilizerWork === "None")
                 continue;
             fertilizerDetail.fertilizer = fertilizerData["row" + i].FertilizerWork;
             fertilizerDetail.quantity = fertilizerData["row" + i].Details;
@@ -297,7 +297,7 @@ function generateObjectFromData(data) {
         const arr = [];
         for (let i = 1; i <= 5; i++) {
             const workDetails = {};
-            if (!farmworkData["row" + i].FarmWork)
+            if (!(farmworkData["row" + i].FarmWork) || farmworkData["row" + i].FarmWork === "None")
                 continue;
             workDetails.work = farmworkData["row" + i].FarmWork;
             workDetails.comments = farmworkData["row" + i].Details;
@@ -313,7 +313,7 @@ function generateObjectFromData(data) {
         const arr = [];
         for (let i = 1; i <= 5; i++) {
             const workDetails = {};
-            if (!soilworkData["row" + i].soilWork)
+            if (!(soilworkData["row" + i].soilWork) || soilworkData["row" + i].soilWork === "None")
                 continue;
             workDetails.work = soilworkData["row" + i].soilWork;
             workDetails.area = soilworkData["row" + i].Details;
@@ -329,7 +329,7 @@ function generateObjectFromData(data) {
         const arr = [];
         for (let i = 1; i <= 5; i++) {
             const workDetails = {};
-            if (!maintenanceworkData["row" + i].MaintenanceWork)
+            if (!(maintenanceworkData["row" + i].MaintenanceWork) || maintenanceworkData["row" + i].MaintenanceWork === "None")
                 continue;
             workDetails.item = maintenanceworkData["row" + i].MaintenanceWork;
             workDetails.comments = maintenanceworkData["row" + i].Details;
