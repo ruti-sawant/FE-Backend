@@ -1,4 +1,6 @@
 import express from "express";
+import dotenv from 'dotenv';
+dotenv.config();
 import fileUpload from "express-fileupload";
 import cors from 'cors';
 import axios from "axios";
@@ -23,13 +25,14 @@ import farmers from './routes/farmers.js';
 import dailyDiary from './routes/dailyDiary.js';
 import bulkUpload from './routes/bulkUpload.js';
 import seasonalData from './routes/seasonalData.js';
+import broadcasts from './routes/broadcast.js';
 
 app.use("/uploadFile", uploadFile);
 app.use("/farmers", farmers);
 app.use("/dailyDiary", dailyDiary);
 app.use("/bulkUpload", bulkUpload);
 app.use("/seasonalData", seasonalData);
-
+app.use("/broadcasts", broadcasts);
 
 const port = process.env.PORT || 3000;
 
@@ -39,7 +42,7 @@ app.listen(port, () => {
 
 //route to fetch filters from database.
 app.get("/filters", (req, res) => {
-    axios.get("https://secure-bastion-17136.herokuapp.com/filters", {
+    axios.get(process.env.API_URL + "/filters", {
         headers: {
             'Content-Type': 'application/json',
             'apiid': process.env.API_KEY

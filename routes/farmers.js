@@ -1,11 +1,13 @@
 import express from 'express';
+import dotenv from 'dotenv';
+dotenv.config();
 import fetch from 'node-fetch';
 import axios from 'axios';
 const router = express.Router();
 
 // /farmers/plots
 router.get("/plots", (req, res) => {
-    fetch('https://secure-bastion-17136.herokuapp.com/farmers?personalInformation=1&plots.farmInformation=1', {
+    fetch(process.env.API_URL + "/farmers?personalInformation=1&plots.farmInformation=1", {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -44,7 +46,7 @@ router.get("/plots", (req, res) => {
 });
 
 router.get("/", (req, res) => {
-    axios.get("https://secure-bastion-17136.herokuapp.com/farmers", {
+    axios.get(process.env.API_URL + "/farmers", {
         headers: {
             'Content-Type': 'application/json',
             'apiid': process.env.API_KEY
@@ -61,7 +63,7 @@ router.get("/", (req, res) => {
 // /farmers/data/{farmerId}
 router.get("/data/:farmerId", (req, res) => {
     const farmerId = req.params.farmerId;
-    axios.get("https://secure-bastion-17136.herokuapp.com/farmers/" + farmerId, {
+    axios.get(process.env.API_URL + "/farmers/" + farmerId, {
         headers: {
             'Content-Type': 'application/json',
             'apiid': process.env.API_KEY
@@ -78,7 +80,7 @@ router.get("/data/:farmerId", (req, res) => {
 
 router.get("/MHCode/:MHCode", (req, res) => {
     const MHCode = req.params.MHCode;
-    axios.get("https://secure-bastion-17136.herokuapp.com/farmers/MHCode/" + MHCode, {
+    axios.get(process.env.API_URL + "/farmers/MHCode/" + MHCode, {
         headers: {
             'Content-Type': 'application/json',
             'apiid': process.env.API_KEY
@@ -97,7 +99,7 @@ router.post("/", async (req, res) => {
     console.log("post farmer body", data);
     try {
         if (data.personalInformation.familyName.trim() === "") {
-            await axios.get("https://secure-bastion-17136.herokuapp.com/farmers/GGN/" + data.personalInformation.GGN, {
+            await axios.get(process.env.API_URL + "/farmers/GGN/" + data.personalInformation.GGN, {
                 headers: {
                     'Content-Type': 'application/json',
                     'apiid': process.env.API_KEY
@@ -117,7 +119,7 @@ router.post("/", async (req, res) => {
                     return;
                 })
         }
-        axios.post("https://secure-bastion-17136.herokuapp.com/farmers", {
+        axios.post(process.env.API_URL + "/farmers", {
             data
         }, {
             headers: {
@@ -140,7 +142,7 @@ router.post("/", async (req, res) => {
 router.post("/plots/addPlot/:farmerId", (req, res) => {
     const farmerId = req.params.farmerId;
     const data = req.body;
-    axios.patch("https://secure-bastion-17136.herokuapp.com/farmers/newPlot/" + farmerId, {
+    axios.patch(process.env.API_URL + "/farmers/newPlot/" + farmerId, {
         data
     }, {
         headers: {
@@ -163,7 +165,7 @@ router.post("/edit/:farmerId", (req, res) => {
     const farmerId = req.params.farmerId;
     const data = req.body;
     console.log("patch body", req.body);
-    axios.patch("https://secure-bastion-17136.herokuapp.com/farmers/" + farmerId, {
+    axios.patch(process.env.API_URL + "/farmers/" + farmerId, {
         data
     }, {
         headers: {
@@ -185,7 +187,7 @@ router.post("/plots/edit/:plotId", (req, res) => {
     const plotId = req.params.plotId;
     const data = req.body;
     console.log("plots patch body", data);
-    axios.patch("https://secure-bastion-17136.herokuapp.com/farmers/plots/" + plotId, {
+    axios.patch(process.env.API_URL + "/farmers/plots/" + plotId, {
         data
     }, {
         headers: {

@@ -1,11 +1,13 @@
 import express from 'express';
+import dotenv from 'dotenv';
+dotenv.config();
 import fetch from 'node-fetch';
 const router = express.Router();
 
 import axios from 'axios';
 
 router.get("/", (req, res) => {
-    axios.get("https://secure-bastion-17136.herokuapp.com/dailyDiary", {
+    axios.get(process.env.API_URL + "/dailyDiary", {
         headers: {
             'Content-Type': 'application/json',
             'apiid': process.env.API_KEY
@@ -21,7 +23,7 @@ router.get("/", (req, res) => {
 
 router.get("/MHCode/:MHCode", (req, res) => {
     const MHCode = req.params.MHCode;
-    axios.get("https://secure-bastion-17136.herokuapp.com/dailyDiary/MHCode/" + MHCode, {
+    axios.get(process.env.API_URL + "/dailyDiary/MHCode/" + MHCode, {
         headers: {
             'Content-Type': 'application/json',
             'apiid': process.env.API_KEY
@@ -37,7 +39,7 @@ router.get("/MHCode/:MHCode", (req, res) => {
 
 router.get("/farmers/:farmerId", (req, res) => {
     const farmerID = req.params.farmerId;
-    axios.get("https://secure-bastion-17136.herokuapp.com/dailyDiary/" + farmerID, {
+    axios.get(process.env.API_URL + "/dailyDiary/" + farmerID, {
         headers: {
             'Content-Type': 'application/json',
             'apiid': process.env.API_KEY
@@ -53,7 +55,7 @@ router.get("/farmers/:farmerId", (req, res) => {
 
 router.get("/diary/:diaryId", (req, res) => {
     const diaryId = req.params.diaryId;
-    axios.get("https://secure-bastion-17136.herokuapp.com/dailyDiary/data/" + diaryId, {
+    axios.get(process.env.API_URL + "/dailyDiary/data/" + diaryId, {
         headers: {
             'Content-Type': 'application/json',
             'apiid': process.env.API_KEY
@@ -74,7 +76,7 @@ router.post("/", async (req, res) => {
     if (data.Plot.PlotID !== 'ALL') {
         objectToPush.farmerId = data.Farmer.FarmerID;
         objectToPush.plot = data.Plot.PlotID;
-        await fetch("https://secure-bastion-17136.herokuapp.com/farmers/" + objectToPush.farmerId + "?personalInformation.GGN=1&plots.farmInformation.plotNumber=1&plots.farmInformation.MHCode=1", {
+        await fetch(process.env.API_URL + "/farmers/" + objectToPush.farmerId + "?personalInformation.GGN=1&plots.farmInformation.plotNumber=1&plots.farmInformation.MHCode=1", {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -103,7 +105,7 @@ router.post("/", async (req, res) => {
                 res.status(400).send(err.message);
             });
         console.log("object", objectToPush);
-        fetch('https://secure-bastion-17136.herokuapp.com/dailyDiary', {
+        fetch(process.env.API_URL + "/dailyDiary", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -130,7 +132,7 @@ router.post("/", async (req, res) => {
             });
     } else {
         const farmerID = data.Farmer.FarmerID;
-        await fetch("https://secure-bastion-17136.herokuapp.com/farmers/" + farmerID + "?personalInformation=1&plots.farmInformation=1", {
+        await fetch(process.env.API_URL + "/farmers/" + farmerID + "?personalInformation=1&plots.farmInformation=1", {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -146,7 +148,7 @@ router.post("/", async (req, res) => {
             .then((result) => {
                 if (result.personalInformation.name.trim() === result.personalInformation.familyName.trim()) {
                     const gcnKey = result.personalInformation.GGN;
-                    fetch("https://secure-bastion-17136.herokuapp.com/farmers/GGN/" + gcnKey + "?_id=1&plots.farmInformation=1", {
+                    fetch(process.env.API_URL + "/farmers/GGN/" + gcnKey + "?_id=1&plots.farmInformation=1", {
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json',
@@ -166,7 +168,7 @@ router.post("/", async (req, res) => {
                                 for (let j = 0; j < result[i].plots.length; j++) {
                                     objectToPush.plot = result[i].plots[j].farmInformation.plotNumber;
                                     objectToPush.MHCode = result[i].plots[j].farmInformation.MHCode;
-                                    fetch('https://secure-bastion-17136.herokuapp.com/dailyDiary', {
+                                    fetch(process.env.API_URL + "/dailyDiary", {
                                         method: 'POST',
                                         headers: {
                                             'Content-Type': 'application/json',
@@ -203,15 +205,10 @@ router.post("/", async (req, res) => {
                     objectToPush.farmerId = result._id;
                     objectToPush.GGN = result.personalInformation.GGN;
                     const plots = result.plots;
-                    const objectArrayToPush = [];
                     for (let i = 0; i < plots.length; i++) {
                         objectToPush.plot = plots[i].farmInformation.plotNumber;
                         objectToPush.MHCode = plots[i].farmInformation.MHCode;
-                        // const tempObjectToPush = objectToPush;
-                        // tempObjectToPush.plot = plots[i].farmInformation.plotNumber;
-                        // objectArrayToPush.push(tempObjectToPush);
-                        // console.log(i + " loop", objectArrayToPush);
-                        fetch('https://secure-bastion-17136.herokuapp.com/dailyDiary', {
+                        fetch(process.env.API_URL + "/dailyDiary", {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -238,8 +235,6 @@ router.post("/", async (req, res) => {
                                     res.status(400).send(err.message);
                             });
                     }
-                    // console.log("Topush", objectArrayToPush);
-
                 }
             })
             .catch((err) => {
@@ -269,6 +264,7 @@ function generateObjectFromData(data) {
             sprayDetail.chemical = sprayingData["row" + i].Chemical;
             sprayDetail.quantity = sprayingData["row" + i].Quantity;
             sprayDetail.imageUrl = sprayingData["row" + i].ImageLink;
+            sprayDetail.imageId = sprayingData["row" + i].ImageId;
             arr.push(sprayDetail);
         }
         objectToPush.spraying = {
@@ -285,6 +281,7 @@ function generateObjectFromData(data) {
             fertilizerDetail.fertilizer = fertilizerData["row" + i].FertilizerWork;
             fertilizerDetail.quantity = fertilizerData["row" + i].Details;
             fertilizerDetail.imageUrl = fertilizerData["row" + i].ImageLink;
+            fertilizerDetail.imageId = fertilizerData["row" + i].ImageId;
             arr.push(fertilizerDetail);
         }
         objectToPush.irrigation = {
@@ -302,6 +299,7 @@ function generateObjectFromData(data) {
             workDetails.work = farmworkData["row" + i].FarmWork;
             workDetails.comments = farmworkData["row" + i].Details;
             workDetails.imageUrl = farmworkData["row" + i].ImageLink;
+            workDetails.imageId = farmworkData["row" + i].ImageId;
             arr.push(workDetails);
         }
         objectToPush.farmWork = {
@@ -318,6 +316,7 @@ function generateObjectFromData(data) {
             workDetails.work = soilworkData["row" + i].soilWork;
             workDetails.area = soilworkData["row" + i].Details;
             workDetails.imageUrl = soilworkData["row" + i].ImageLink;
+            workDetails.imageId = soilworkData["row" + i].ImageId;
             arr.push(workDetails);
         }
         objectToPush.soilWork = {
@@ -334,6 +333,7 @@ function generateObjectFromData(data) {
             workDetails.item = maintenanceworkData["row" + i].MaintenanceWork;
             workDetails.comments = maintenanceworkData["row" + i].Details;
             workDetails.imageUrl = maintenanceworkData["row" + i].ImageLink;
+            workDetails.imageId = maintenanceworkData["row" + i].ImageId;
             arr.push(workDetails);
         }
         objectToPush.maintenanceWork = {

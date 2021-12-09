@@ -94,7 +94,7 @@ router.post("/", (req, res) => {
             }
             dataToSend.push(diary);
             console.log(diary);
-            // fetch('https://secure-bastion-17136.herokuapp.com/dailyDiary', {
+            // fetch(process.env.API_URL+"/dailyDiary", {
             //     method: 'POST',
             //     headers: {
             //         'Content-Type': 'application/json',

@@ -3,7 +3,7 @@ import axios from 'axios';
 const router = express.Router();
 
 router.get("/", (req, res) => {
-    axios.get("https://secure-bastion-17136.herokuapp.com/seasonalData", {
+    axios.get(process.env.API_URL + "/seasonalData", {
         headers: {
             'Content-Type': 'application/json',
             'apiid': process.env.API_KEY
@@ -19,7 +19,7 @@ router.get("/", (req, res) => {
 
 router.get("/plots/:plotId", (req, res) => {
     const plotId = req.params.plotId;
-    axios.get("https://secure-bastion-17136.herokuapp.com/seasonalData/farmers/plots/" + plotId, {
+    axios.get(process.env.API_URL + "/seasonalData/farmers/plots/" + plotId, {
         headers: {
             'Content-Type': 'application/json',
             'apiid': process.env.API_KEY
@@ -36,7 +36,7 @@ router.get("/plots/:plotId", (req, res) => {
 router.post("/", (req, res) => {
     const data = req.body;
     console.log("post body", req.body);
-    axios.post("https://secure-bastion-17136.herokuapp.com/seasonalData", {
+    axios.post(process.env.API_URL + "/seasonalData", {
         data
     }, {
         headers: {
@@ -58,7 +58,7 @@ router.post("/edit/:seasonalDataId", (req, res) => {
     const seasonalDataId = req.params.seasonalDataId;
     const data = req.body;
     console.log("patch body", req.body);
-    axios.patch("https://secure-bastion-17136.herokuapp.com/seasonalData/" + seasonalDataId, {
+    axios.patch(process.env.API_URL + "/seasonalData/" + seasonalDataId, {
         data
     }, {
         headers: {
