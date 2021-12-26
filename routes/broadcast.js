@@ -72,7 +72,7 @@ router.post("/", (req, res) => {
             res.status(200).send({ message: "Broadcast inserted successfully" });
         })
         .catch((err) => {
-            console.log("Broadcast insert err", data);
+            console.log("Broadcast insert err", err);
             res.status(400).send({ message: err.message });
         });
 });

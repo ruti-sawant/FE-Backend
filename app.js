@@ -26,6 +26,7 @@ import dailyDiary from './routes/dailyDiary.js';
 import bulkUpload from './routes/bulkUpload.js';
 import seasonalData from './routes/seasonalData.js';
 import broadcasts from './routes/broadcast.js';
+import mrlReports from './routes/mrl.js';
 
 app.use("/uploadFile", uploadFile);
 app.use("/farmers", farmers);
@@ -33,6 +34,7 @@ app.use("/dailyDiary", dailyDiary);
 app.use("/bulkUpload", bulkUpload);
 app.use("/seasonalData", seasonalData);
 app.use("/broadcasts", broadcasts);
+app.use("/mrlReports", mrlReports);
 
 const port = process.env.PORT || 3000;
 
