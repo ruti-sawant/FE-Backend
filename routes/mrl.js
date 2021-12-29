@@ -99,6 +99,131 @@ router.post("/", (req, res) => {
         });
 });
 
+
+//function added by Harshal
+router.post("/uploadCSV", (req, res) => {
+    if (req.files) {
+        const readable = Readable.from(req.files.allMRLReports.data);
+        const dataToSend = [];
+        const tempData = [];
+        try {
+            readable
+                .pipe(csv())
+                .on("data", (row) => {
+                    tempData.push(row);
+                })
+                .on("end", () => {
+                    tempData.sort((a, b) =>
+                        a.sampleNumber > b.sampleNumber
+                            ? 1
+                            : a.sampleNumber === b.sampleNumber
+                                ? a.year > b.year
+                                    ? 1
+                                    : -1
+                                : -1
+                    );
+                    for (let i = 0; i < tempData.length; i++) {
+                        let flg = 0;
+                        for (let j = 0; j < dataToSend.length; j++) {
+                            // Pushing new Chemical in existing Item
+                            if (
+                                tempData[i].sampleNumber === dataToSend[j].sampleNumber &&
+                                tempData[i].year === dataToSend[j].year
+                            ) {
+                                flg = 1;
+                                let newChemical = {
+                                    srNo: tempData[i].srNo,
+                                    detectedPesticide: tempData[i].detectedPesticide,
+                                    result: tempData[i].result,
+                                    EUMRL: tempData[i].EUMRL,
+                                    LOQ: tempData[i].LOQ,
+                                    ArFD: tempData[i].ArFD,
+                                    intake: tempData[i].intake,
+                                    ArFDPercent: tempData[i].ArFDPercent,
+                                    remark: tempData[i].remark,
+                                    // partOfAnnex9: tempData[i].partOfAnnex9,
+                                    // redList: tempData[i].redList,
+                                };
+                                dataToSend[j].chemicals.push(newChemical);
+                            }
+                        }
+
+                        if (flg === 0) {
+                            //Pushing new Item
+                            let newChemical = {
+                                srNo: tempData[i].srNo,
+                                detectedPesticide: tempData[i].detectedPesticide,
+                                result: tempData[i].result,
+                                EUMRL: tempData[i].EUMRL,
+                                LOQ: tempData[i].LOQ,
+                                ArFD: tempData[i].ArFD,
+                                intake: tempData[i].intake,
+                                ArFDPercent: tempData[i].ArFDPercent,
+                                remark: tempData[i].remark,
+                                // partOfAnnex9: tempData[i].partOfAnnex9,
+                                // redList: tempData[i].redList,
+                            };
+                            let splittedDate = tempData[i].dateOfSampling.split("/");
+                            if (splittedDate.length != 3)
+                                splittedDate = tempData[i].dateOfSampling.split("-");
+                            // console.log(splittedDate);
+                            const dateObj = new Date(new Date(splittedDate[1] + "-" + splittedDate[0] + "-" + splittedDate[2]) - new Date().getTimezoneOffset() * 60000);
+                            // console.log(dateObj);
+                            let newItem = {
+                                year: tempData[i].year,
+                                sealNumber: tempData[i].sealNumber,
+                                sampleNumber: tempData[i].sampleNumber,
+                                labName: tempData[i].labName,
+                                farmerName: tempData[i].farmerName,
+                                dateOfSampling: dateObj,
+                                address: tempData[i].address,
+                                MHCode: tempData[i].MHCode,
+                                variety: tempData[i].variety,
+                                quantityMT: tempData[i].quantityMT_4B,
+                                brix: tempData[i].brix,
+                                fePoRef: tempData[i].fePoRef,
+                                samplerName: tempData[i].samplerName,
+                                chemicals: [],
+                            };
+                            newItem.chemicals.push(newChemical);
+                            dataToSend.push(newItem);
+                        }
+                    }
+                    // console.log("In the end", dataToSend);
+                    //method to post data to API server.
+                    axios.post(process.env.API_URL + "/mrlReports/postAll", {
+                        data: dataToSend
+                    }, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apiid': process.env.API_KEY
+                        }
+                    })
+                        .then((data) => {
+                            console.log(data.data);
+                            res.status(200).send(data.data);
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                            if (err.response && err.response.data && err.response.data.message) {
+                                res.status(400).send({ message: err.response.data.message });
+                            } else {
+                                res.status(400).send({ message: err.message });
+                            }
+                        });
+
+                });
+        } catch (err) {
+            console.log(err);
+            res.status(400).send({ message: err.message });
+        }
+    } else {
+        console.log("No file uploaded");
+        res.status(400).send({ message: "File not uploaded" });
+    }
+});
+
+
 router.post("/delete/:mrlId", (req, res) => {
     const mrlId = req.params.mrlId;
     axios.delete(process.env.API_URL + "/mrlReports/" + mrlId, {
