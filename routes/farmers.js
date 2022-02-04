@@ -206,6 +206,43 @@ router.post("/plots/edit/:plotId", (req, res) => {
 });
 
 
+router.post("/delete/:farmerId", (req, res) => {
+    const farmerId = req.params.farmerId;
+    axios.delete(process.env.API_URL + "/farmers/" + farmerId, {
+        headers: {
+            'Content-Type': 'application/json',
+            'apiid': process.env.API_KEY
+        }
+    })
+        .then((data) => {
+            console.log("data", data);
+            res.status(200).send({ message: "Farmer " + farmerId + " deleted successfully" });
+        })
+        .catch((err) => {
+            console.log("err", err);
+            res.status(400).send({ message: err.message });
+        });
+});
+
+router.post("/delete/plot/:plotId", (req, res) => {
+    const plotId = req.params.plotId;
+    axios.patch(process.env.API_URL + "/farmers/deletePlot/" + plotId, {
+    }, {
+        headers: {
+            'Content-Type': 'application/json',
+            'apiid': process.env.API_KEY
+        }
+    })
+        .then((data) => {
+            console.log("data", data);
+            res.status(200).send({ message: "Farmer plot " + plotId + " deleted successfully" });
+        })
+        .catch((err) => {
+            console.log("err", err);
+            res.status(400).send({ message: err.response.data.message });
+        });
+});
+
 export default router;
 
 

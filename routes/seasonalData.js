@@ -75,4 +75,77 @@ router.post("/edit/:seasonalDataId", (req, res) => {
         });
 });
 
+router.post("/delete/deleteByYear/:year", (req, res) => {
+    const year = req.params.year;
+    axios.delete(process.env.API_URL + "/seasonalData/deleteByYear/data/" + year, {
+        headers: {
+            'Content-Type': 'application/json',
+            'apiid': process.env.API_KEY
+        }
+    })
+        .then((data) => {
+            console.log("data", data);
+            res.status(200).send({ message: "year " + year + " records deleted successfully" });
+        })
+        .catch((err) => {
+            console.log("err", err);
+            res.status(400).send({ message: err.message });
+        });
+});
+
+router.post("/delete/deleteByPlot/:plotId", (req, res) => {
+    const plotId = req.params.plotId;
+    axios.delete(process.env.API_URL + "/seasonalData/deleteByPlot/data/" + plotId, {
+        headers: {
+            'Content-Type': 'application/json',
+            'apiid': process.env.API_KEY
+        }
+    })
+        .then((data) => {
+            console.log("data", data);
+            res.status(200).send({ message: "year " + plotId + " records deleted successfully" });
+        })
+        .catch((err) => {
+            console.log("err", err);
+            res.status(400).send({ message: err.message });
+        });
+});
+
+
+router.post("/delete/deleteByFarmer/:farmerId", (req, res) => {
+    const farmerId = req.params.farmerId;
+    axios.delete(process.env.API_URL + "/seasonalData/" + farmerId, {
+        headers: {
+            'Content-Type': 'application/json',
+            'apiid': process.env.API_KEY
+        }
+    })
+        .then((data) => {
+            console.log("data", data);
+            res.status(200).send({ message: "farmer " + farmerId + " records deleted successfully" });
+        })
+        .catch((err) => {
+            console.log("err", err);
+            res.status(400).send({ message: err.message });
+        });
+});
+
+router.post("/delete/deleteBySeasonalId/:seasonalId", (req, res) => {
+    const seasonalId = req.params.seasonalId;
+    axios.delete(process.env.API_URL + "/seasonalData/data/" + seasonalId, {
+        headers: {
+            'Content-Type': 'application/json',
+            'apiid': process.env.API_KEY
+        }
+    })
+        .then((data) => {
+            console.log("data", data);
+            res.status(200).send({ message: "seasonal data " + seasonalId + " record deleted successfully" });
+        })
+        .catch((err) => {
+            console.log("err", err);
+            res.status(400).send({ message: err.message });
+        });
+});
+
 export default router;
