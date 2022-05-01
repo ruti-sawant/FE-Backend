@@ -25,6 +25,7 @@ import seasonalData from "./routes/seasonalData.js";
 import broadcasts from "./routes/broadcast.js";
 import mrlReports from "./routes/mrl.js";
 import cropMonitoring from "./routes/cropMonitoring.js";
+import admins from "./routes/admins.js";
 
 app.use("/uploadFile", uploadFile);
 app.use("/farmers", farmers);
@@ -34,6 +35,7 @@ app.use("/seasonalData", seasonalData);
 app.use("/broadcasts", broadcasts);
 app.use("/mrlReports", mrlReports);
 app.use("/cropMonitoring", cropMonitoring);
+app.use("/admins", admins);
 
 const port = process.env.PORT || 3000;
 
