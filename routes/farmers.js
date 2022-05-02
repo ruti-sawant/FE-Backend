@@ -53,9 +53,44 @@ router.get("/", (req, res) => {
         }
     })
         .then((data) => {
-            res.status(200).send(data.data);
+            // console.log(data.data);
+            axios.get(process.env.API_URL + "/seasonalData", {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apiid': process.env.API_KEY
+                }
+            })
+                .then((seasonalData) => {
+                    const farmerDataReceived = data.data;
+                    const seasonalDataReceived = seasonalData.data;
+                    const farmerMapping = new Map();
+                    for (let i = 0; i < farmerDataReceived.length; i++) {
+                        for (let j = 0; j < farmerDataReceived[i].plots.length; j++) {
+                            farmerMapping.set(farmerDataReceived[i].plots[j].farmInformation.MHCode, { i, j });
+                        }
+                    }
+                    const seasonalDataMapping = new Map();
+                    for (let i = 0; i < seasonalDataReceived.length; i++) {
+                        if (seasonalDataMapping.has(seasonalDataReceived[i].MHCode) && new Date(seasonalDataMapping.get(seasonalDataReceived[i].MHCode)) > new Date(seasonalDataReceived[i].cropMilestoneDates.fruitPruning)) {
+                            continue;
+                        }
+                        seasonalDataMapping.set(seasonalDataReceived[i].MHCode, seasonalDataReceived[i].cropMilestoneDates.fruitPruning);
+                    }
+                    for (let key of seasonalDataMapping.keys()) {
+                        // console.log(key, seasonalDataMapping.get(key));
+                        if (farmerMapping.get(key))
+                            farmerDataReceived[farmerMapping.get(key).i].plots[farmerMapping.get(key).j].farmInformation.fruitPruning = seasonalDataMapping.get(key);
+
+                    }
+                    res.status(200).send(farmerDataReceived);
+                })
+                .catch((err) => {
+                    console.log("seasonalData", err);
+                    res.status(400).send({ message: err.message });
+                });
         })
         .catch((err) => {
+            console.log("farmer", err);
             res.status(400).send({ message: err.message });
         });
 });
