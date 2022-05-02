@@ -10,6 +10,7 @@ const clientSecret = process.env.CLIENT_SECRETE;
 const redirectUri = process.env.REDIRECT_URI;
 const refreshToken = process.env.REFRESH_TOKEN;
 
+
 const oauth2Client = new google.auth.OAuth2(
     clientID,
     clientSecret,
@@ -22,18 +23,40 @@ const drive = google.drive({
     auth: oauth2Client,
 });
 
+
+//according to old method of usage according to old code and files are getting saved in "broadcast Daily Diary images" folder.
 router.post("/", async (req, res) => {
     if (req.files) {
         // console.log(req.files);
 
         //function to asyncly upload file to drive
-        const result = await uploadFile(req.files.image.name, req.files.image.mimetype, req.files.image.data);
+        const result = await uploadFile(req.files.image.name, req.files.image.mimetype, req.files.image.data, "OLD_FOLDER");
         res.status(200).json({
             link: result.webViewLink,
             id: result.id
         });
     } else {
         console.log("No file uploaded");
+        res.status(400).send({ message: "No file uploaded" });
+    }
+});
+
+
+router.post("/:folderName", async (req, res) => {
+    if (req.files) {
+        // console.log(req.params.folderName);
+        // console.log(req.files);
+
+
+        //function to asyncly upload file to drive
+        const result = await uploadFile(req.files.image.name, req.files.image.mimetype, req.files.image.data, req.params.folderName);
+        res.status(200).json({
+            link: result.webViewLink,
+            id: result.id
+        });
+    } else {
+        console.log("No file uploaded");
+        res.status(400).send({ message: "No file uploaded" });
     }
 });
 
@@ -60,9 +83,11 @@ async function deleteFile(fileId) {
         })
 }
 
-async function uploadFile(fileName, mimeType, data) {
+async function uploadFile(fileName, mimeType, data, folderName) {
     try {
-        // console.log(fileName);
+        // id from .env
+        const folderId = process.env[folderName];
+
         // console.log(typeof data);
         const responce = await drive.files.create({
             name: fileName,
@@ -73,6 +98,7 @@ async function uploadFile(fileName, mimeType, data) {
         });//firstly to upload file.
         await drive.files.update({
             fileId: responce.data.id,
+            addParents: folderId,
             resource: { name: fileName }
         });//to rename file to required name.
         return await generatePublicUrl(responce.data.id);
