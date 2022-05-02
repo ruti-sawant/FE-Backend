@@ -15,7 +15,7 @@ router.get("/plots", (req, res) => {
         }
     })
         .then((result) => {
-            console.log("status", result.status);
+            // console.log("status", result.status);
             if (result.status == 200)
                 return result.json();
             else
@@ -29,6 +29,8 @@ router.get("/plots", (req, res) => {
                 const farmerObject = {};
                 farmerObject.farmerID = result[i]._id;
                 farmerObject.farmerName = result[i].personalInformation.name;
+                farmerObject.familyName = result[i].personalInformation.familyName;
+                farmerObject.GGN = result[i].personalInformation.GGN;
                 if (result[i].personalInformation.name.trim() === result[i].personalInformation.familyName.trim()) {
                     farmerObject.plot = getPlotsForHead(result, i);
                 } else {
@@ -42,6 +44,7 @@ router.get("/plots", (req, res) => {
         })
         .catch((err) => {
             console.log("err", err);
+            res.status(400).send({ message: err.message });
         });
 });
 
