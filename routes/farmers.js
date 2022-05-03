@@ -3,11 +3,16 @@ import dotenv from 'dotenv';
 dotenv.config();
 import fetch from 'node-fetch';
 import axios from 'axios';
+
+import csv from "csv-parser";
+import { Readable } from "stream";
+import { Parser } from "json2csv";
+
 const router = express.Router();
 
 // /farmers/plots
 router.get("/plots", (req, res) => {
-    fetch(process.env.API_URL + "/farmers?personalInformation=1&plots.farmInformation=1", {
+    fetch(process.env.API_URL + "/farmers?personalInformation=1&plots.farmInformation=1&plots._id=1", {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -281,6 +286,367 @@ router.post("/delete/plot/:plotId", (req, res) => {
         });
 });
 
+router.get("/exportFarmers", (req, res) => {
+    axios.get(process.env.API_URL + "/farmers", {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'apiid': process.env.API_KEY
+        }
+    })
+        .then((data) => {
+            const result = data.data;
+            axios.get(process.env.API_URL + "/seasonalData", {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apiid': process.env.API_KEY
+                }
+            })
+                .then(async (data) => {
+
+                    //for extraction of seasonalData
+                    const seasonalData = data.data;
+                    const seasonalDataLength = seasonalData.length;
+                    const mhcodeSeasonaldata = new Map();
+                    for (let i = 0; i < seasonalDataLength; i++) {
+                        if (!mhcodeSeasonaldata.has(seasonalData[i].MHCode)) {
+                            mhcodeSeasonaldata.set(seasonalData[i].MHCode, [i]);
+                        } else {
+                            mhcodeSeasonaldata.get(seasonalData[i].MHCode).push(i);
+                        }
+                    }
+
+                    //for extraction of farmer data.
+                    let resultLength = result.length;
+                    let objectToSend = [];
+                    for (let i = 0; i < resultLength; i++) {
+                        const farmerObject = {};
+                        farmerObject.farmerId = result[i]._id;
+                        farmerObject.personalInformation = result[i].personalInformation;
+                        const plots = getPlotsForExport(result, i);
+                        for (let i = 0; i < plots.length; i++) {
+                            farmerObject.plot = plots[i];
+                            // console.log(plots[i]);
+                            const seasonalDataIndices = mhcodeSeasonaldata.get(plots[i].farmInformation.MHCode);
+                            if (seasonalDataIndices && seasonalDataIndices.length > 0) {
+                                for (let j = 0; j < seasonalDataIndices.length; j++) {
+                                    farmerObject.seasonalData = seasonalData[seasonalDataIndices[j]];
+                                    objectToSend.push({ ...farmerObject });
+                                }
+                            } else {
+                                objectToSend.push({ ...farmerObject });
+                            }
+                        }
+                    }
+
+
+
+                    // console.log(mhcodeSeasonaldata);
+                    // console.log(objectToSend);
+                    //export % should be calculated dynamically
+                    const fields = ["srNo", "farmerId", "farmerName", "profileUrl", "mobile", "email", "familyName", "GGN", "farmMap", "plotNumber", "MHCode", "crop", "variety", "soilType", "plotArea", "latitude", "longitude", "googleMap", "village", "taluka", "district", "pincode", "tags", "nameOfConsultant", "notes", "spacingBetweenRows", "spacingBetweenCrops",
+                        "year", "plantationDate", "foundationPruningDate", "fruitPruningDate", "readyToHarvestDate", "actualHarvestDate", "exportTonnage", "localTonnage", "exportPercent", "soilReport", "petioleReport", "waterReport", "preharvestQCLinks", "primaryIssuesFacedAtHarvest", "inwardQClinks", "knittingQCLinks", "packingQCLinks", "FGQCLinks", "onArrivalQCLinks", "primaryQualityIssueFaced", "MRLMaxIndividual", "MRLSum", "MRLNumberOfDetections", "MRLRedlistChemicals", "MRLReportLink", "quality"];
+                    // console.log(fields.length);
+                    const csvData = [];
+                    for (let i = 0; i < objectToSend.length; i++) {
+                        const tempObject = {};
+                        tempObject.srNo = i + 1;
+                        if (objectToSend[i].farmerId) {
+                            tempObject.farmerId = objectToSend[i].farmerId;
+                        } else {
+                            tempObject.farmerId = "";
+                        }
+                        if (objectToSend[i].personalInformation && objectToSend[i].personalInformation.name) {
+                            tempObject.farmerName = objectToSend[i].personalInformation.name;
+                        } else {
+                            tempObject.farmerName = "";
+                        }
+                        if (objectToSend[i].personalInformation && objectToSend[i].personalInformation.profileUrl) {
+                            tempObject.profileUrl = objectToSend[i].personalInformation.profileUrl;
+                        } else {
+                            tempObject.profileUrl = "";
+                        }
+                        if (objectToSend[i].personalInformation && objectToSend[i].personalInformation.mobileNumber && objectToSend[i].personalInformation.mobileNumber.length > 0) {
+                            tempObject.mobile = objectToSend[i].personalInformation.mobileNumber[0];
+                        } else {
+                            tempObject.mobile = "";
+                        }
+                        if (objectToSend[i].personalInformation && objectToSend[i].personalInformation.email) {
+                            tempObject.email = objectToSend[i].personalInformation.email;
+                        } else {
+                            tempObject.email = "";
+                        }
+                        if (objectToSend[i].personalInformation && objectToSend[i].personalInformation.familyName) {
+                            tempObject.familyName = objectToSend[i].personalInformation.familyName;
+                        } else {
+                            tempObject.familyName = "";
+                        }
+                        if (objectToSend[i].personalInformation && objectToSend[i].personalInformation.GGN) {
+                            tempObject.GGN = objectToSend[i].personalInformation.GGN;
+                        } else {
+                            tempObject.GGN = "";
+                        }
+                        if (objectToSend[i].personalInformation && objectToSend[i].personalInformation.farmMap) {
+                            tempObject.farmMap = objectToSend[i].personalInformation.farmMap;
+                        } else {
+                            tempObject.farmMap = "";
+                        }
+                        if (objectToSend[i].personalInformation && objectToSend[i].personalInformation.consultantName) {
+                            tempObject.consultantName = objectToSend[i].personalInformation.consultantName;
+                        } else {
+                            tempObject.consultantName = "";
+                        }
+                        if (objectToSend[i].plot && objectToSend[i].plot.farmInformation && objectToSend[i].plot.farmInformation.plotNumber) {
+                            tempObject.plotNumber = objectToSend[i].plot.farmInformation.plotNumber;
+                        } else {
+                            tempObject.plotNumber = "";
+                        }
+                        if (objectToSend[i].plot && objectToSend[i].plot.farmInformation && objectToSend[i].plot.farmInformation.MHCode) {
+                            tempObject.MHCode = objectToSend[i].plot.farmInformation.MHCode;
+                        } else {
+                            tempObject.MHCode = "";
+                        }
+                        if (objectToSend[i].plot && objectToSend[i].plot.farmInformation && objectToSend[i].plot.farmInformation.crop) {
+                            tempObject.crop = objectToSend[i].plot.farmInformation.crop;
+                        } else {
+                            tempObject.crop = "";
+                        }
+                        if (objectToSend[i].plot && objectToSend[i].plot.farmInformation && objectToSend[i].plot.farmInformation.variety) {
+                            tempObject.variety = objectToSend[i].plot.farmInformation.variety;
+                        } else {
+                            tempObject.variety = "";
+                        }
+                        if (objectToSend[i].plot && objectToSend[i].plot.farmInformation && objectToSend[i].plot.farmInformation.soilType) {
+                            tempObject.soilType = objectToSend[i].plot.farmInformation.soilType;
+                        } else {
+                            tempObject.soilType = "";
+                        }
+                        if (objectToSend[i].plot && objectToSend[i].plot.farmInformation && objectToSend[i].plot.farmInformation.plotArea) {
+                            tempObject.plotArea = objectToSend[i].plot.farmInformation.plotArea;
+                        } else {
+                            tempObject.plotArea = "";
+                        }
+                        if (objectToSend[i].plot && objectToSend[i].plot.address && objectToSend[i].plot.address.coordinates && objectToSend[i].plot.address.coordinates.latitude) {
+                            tempObject.latitude = objectToSend[i].plot.address.coordinates.latitude;
+                        } else {
+                            tempObject.latitude = "";
+                        }
+                        if (objectToSend[i].plot && objectToSend[i].plot.address && objectToSend[i].plot.address.coordinates && objectToSend[i].plot.address.coordinates.longitude) {
+                            tempObject.longitude = objectToSend[i].plot.address.coordinates.longitude;
+                        } else {
+                            tempObject.longitude = "";
+                        }
+                        if (objectToSend[i].plot && objectToSend[i].plot.address && objectToSend[i].plot.address.mapLink) {
+                            tempObject.mapLink = objectToSend[i].plot.address.mapLink;
+                        } else {
+                            tempObject.mapLink = "";
+                        }
+                        if (objectToSend[i].plot && objectToSend[i].plot.address && objectToSend[i].plot.address.village) {
+                            tempObject.village = objectToSend[i].plot.address.village;
+                        } else {
+                            tempObject.village = "";
+                        }
+                        if (objectToSend[i].plot && objectToSend[i].plot.address && objectToSend[i].plot.address.taluka) {
+                            tempObject.taluka = objectToSend[i].plot.address.taluka;
+                        } else {
+                            tempObject.taluka = "";
+                        }
+                        if (objectToSend[i].plot && objectToSend[i].plot.address && objectToSend[i].plot.address.district) {
+                            tempObject.district = objectToSend[i].plot.address.district;
+                        } else {
+                            tempObject.district = "";
+                        }
+                        if (objectToSend[i].plot && objectToSend[i].plot.address && objectToSend[i].plot.address.pincode) {
+                            tempObject.pincode = objectToSend[i].plot.address.pincode;
+                        } else {
+                            tempObject.pincode = "";
+                        }
+                        if (objectToSend[i].plot && objectToSend[i].plot.other && objectToSend[i].plot.other.tags && objectToSend[i].plot.other.tags.length > 0) {
+                            tempObject.tags = objectToSend[i].plot.other.tags.join(",");
+                        } else {
+                            tempObject.tags = "";
+                        }
+                        if (objectToSend[i].plot && objectToSend[i].plot.other && objectToSend[i].plot.other.notes) {
+                            tempObject.notes = objectToSend[i].plot.other.notes;
+                        } else {
+                            tempObject.notes = "";
+                        }
+                        if (objectToSend[i].plot && objectToSend[i].plot.cropSpacing && objectToSend[i].plot.cropSpacing.betweenTwoRows) {
+                            tempObject.spacingBetweenRows = objectToSend[i].plot.cropSpacing.betweenTwoRows;
+                        } else {
+                            tempObject.spacingBetweenRows = "";
+                        }
+                        if (objectToSend[i].plot && objectToSend[i].plot.cropSpacing && objectToSend[i].plot.cropSpacing.betweenTwoCrops) {
+                            tempObject.spacingBetweenCrops = objectToSend[i].plot.cropSpacing.betweenTwoCrops;
+                        } else {
+                            tempObject.spacingBetweenCrops = "";
+                        }
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.year) {
+                            tempObject.year = objectToSend[i].seasonalData.year;
+                        } else {
+                            tempObject.year = "";
+                        }
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.cropMilestoneDates && objectToSend[i].seasonalData.cropMilestoneDates.plantation) {
+                            tempObject.plantationDate = objectToSend[i].seasonalData.cropMilestoneDates.plantation;
+                        } else {
+                            tempObject.plantationDate = "";
+                        }
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.cropMilestoneDates && objectToSend[i].seasonalData.cropMilestoneDates.foundationPruning) {
+                            tempObject.foundationPruningDate = objectToSend[i].seasonalData.cropMilestoneDates.foundationPruning;
+                        } else {
+                            tempObject.foundationPruningDate = "";
+                        }
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.cropMilestoneDates && objectToSend[i].seasonalData.cropMilestoneDates.fruitPruning) {
+                            tempObject.fruitPruningDate = objectToSend[i].seasonalData.cropMilestoneDates.fruitPruning;
+                        } else {
+                            tempObject.fruitPruningDate = "";
+                        }
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.cropMilestoneDates && objectToSend[i].seasonalData.cropMilestoneDates.readyToHarvest) {
+                            tempObject.readyToHarvestDate = objectToSend[i].seasonalData.cropMilestoneDates.readyToHarvest;
+                        } else {
+                            tempObject.readyToHarvestDate = "";
+                        }
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.cropMilestoneDates && objectToSend[i].seasonalData.cropMilestoneDates.actualHarvest) {
+                            tempObject.actualHarvestDate = objectToSend[i].seasonalData.cropMilestoneDates.actualHarvest;
+                        } else {
+                            tempObject.actualHarvestDate = "";
+                        }
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.yield && objectToSend[i].seasonalData.yield.exportTonnage > 0) {
+                            tempObject.exportTonnage = objectToSend[i].seasonalData.yield.exportTonnage;
+                        } else {
+                            tempObject.exportTonnage = "";
+                        }
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.yield && objectToSend[i].seasonalData.yield.localTonnage > 0) {
+                            tempObject.localTonnage = objectToSend[i].seasonalData.yield.localTonnage;
+                        } else {
+                            tempObject.localTonnage = "";
+                        }
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.yield && objectToSend[i].seasonalData.yield.exportTonnage && objectToSend[i].seasonalData && objectToSend[i].seasonalData.yield && (objectToSend[i].seasonalData.yield.exportTonnage + objectToSend[i].seasonalData.yield.localTonnage) > 0) {
+                            tempObject.exportPercent = objectToSend[i].seasonalData.yield.exportTonnage / (objectToSend[i].seasonalData.yield.exportTonnage + objectToSend[i].seasonalData.yield.localTonnage);
+                        } else {
+                            tempObject.exportPercent = 0;
+                        }
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.reports && objectToSend[i].seasonalData.reports.petioleReportUrl) {
+                            tempObject.petioleReport = objectToSend[i].seasonalData.reports.petioleReportUrl;
+                        } else {
+                            tempObject.petioleReport = "";
+                        }
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.reports && objectToSend[i].seasonalData.reports.soilReportUrl) {
+                            tempObject.soilReport = objectToSend[i].seasonalData.reports.soilReportUrl;
+                        } else {
+                            tempObject.soilReport = "";
+                        }
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.reports && objectToSend[i].seasonalData.reports.waterReportUrl) {
+                            tempObject.waterReport = objectToSend[i].seasonalData.reports.waterReportUrl;
+                        } else {
+                            tempObject.waterReport = "";
+                        }
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.qualityJotforms && objectToSend[i].seasonalData.qualityJotforms.preharvestQCLink) {
+                            tempObject.preharvestQCLinks = objectToSend[i].seasonalData.qualityJotforms.preharvestQCLink;
+                        } else {
+                            tempObject.preharvestQCLinks = "";
+                        }
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.qualityJotforms && objectToSend[i].seasonalData.qualityJotforms.primaryIssuesFacedAtHarvest) {
+                            tempObject.primaryIssuesFacedAtHarvest = objectToSend[i].seasonalData.qualityJotforms.primaryIssuesFaced;
+                        } else {
+                            tempObject.primaryIssuesFacedAtHarvest = "";
+                        }
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.qualityJotforms && objectToSend[i].seasonalData.qualityJotforms.inwardQClinks) {
+                            tempObject.inwardQClinks = objectToSend[i].seasonalData.qualityJotforms.inwardQClink;
+                        } else {
+                            tempObject.inwardQClinks = "";
+                        }
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.qualityJotforms && objectToSend[i].seasonalData.qualityJotforms.knittingQCLinks) {
+                            tempObject.knittingQCLinks = objectToSend[i].seasonalData.qualityJotforms.knittingQCLinks;
+                        } else {
+                            tempObject.knittingQCLinks = "";
+                        }
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.qualityJotforms && objectToSend[i].seasonalData.qualityJotforms.packingQCLinks) {
+                            tempObject.packingQCLinks = objectToSend[i].seasonalData.qualityJotforms.packingQCLinks;
+                        } else {
+                            tempObject.packingQCLinks = "";
+                        }
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.qualityJotforms && objectToSend[i].seasonalData.qualityJotforms.FGQCLinks) {
+                            tempObject.FGQCLinks = objectToSend[i].seasonalData.qualityJotforms.FGQCLinks;
+                        } else {
+                            tempObject.FGQCLinks = "";
+                        }
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.qualityJotforms && objectToSend[i].seasonalData.qualityJotforms.onArrivalQCLinks) {
+                            tempObject.onArrivalQCLinks = objectToSend[i].seasonalData.qualityJotforms.onArrivalQCLinks;
+                        } else {
+                            tempObject.onArrivalQCLinks = "";
+                        }
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.primaryQualityIssuesFaced && objectToSend[i].seasonalData.primaryQualityIssuesFaced.length > 0) {
+                            tempObject.primaryQualityIssuesFaced = objectToSend[i].seasonalData.primaryQualityIssuesFaced.join(",");
+                        } else {
+                            tempObject.primaryQualityIssuesFaced = "";
+                        }
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.MRLResults && objectToSend[i].seasonalData.MRLResults.maxIndividual) {
+                            tempObject.MRLMaxIndividual = objectToSend[i].seasonalData.MRLResults.maxIndividual;
+                        } else {
+                            tempObject.MRLMaxIndividual = "";
+                        }
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.MRLResults && objectToSend[i].seasonalData.MRLResults.sum) {
+                            tempObject.MRLSum = objectToSend[i].seasonalData.MRLResults.sum;
+                        } else {
+                            tempObject.MRLSum = "";
+                        }
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.MRLResults && objectToSend[i].seasonalData.MRLResults.numberOfDetection) {
+                            tempObject.MRLNumberOfDetections = objectToSend[i].seasonalData.MRLResults.numberOfDetection;
+                        } else {
+                            tempObject.MRLNumberOfDetections = "";
+                        }
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.MRLResults && objectToSend[i].seasonalData.MRLResults.redlistChemicals) {
+                            tempObject.MRLRedlistChemicals = objectToSend[i].seasonalData.MRLResults.redlistChemicals;
+                        } else {
+                            tempObject.MRLRedlistChemicals = "";
+                        }
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.MRLResults && objectToSend[i].seasonalData.MRLResults.MRLReportLink) {
+                            tempObject.MRLReportLink = objectToSend[i].seasonalData.MRLResults.MRLReportLink;
+                        } else {
+                            tempObject.MRLReportLink = "";
+                        }
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.quality) {
+                            tempObject.quality = objectToSend[i].seasonalData.quality;
+                        } else {
+                            tempObject.quality = "";
+                        }
+                        csvData.push(tempObject);
+                    }
+                    const parser = new Parser({ fields });
+                    const csv = parser.parse(csvData);
+                    // console.log(csv);
+                    res.setHeader("Content-Type", "text/csv");
+                    // res.setHeader("Content-Disposition", "attachment; filename=" + eventName + ".csv");
+                    res.attachment("farmersDataExport.csv")
+                    res.status(200).end(csv);
+                })
+                .catch((err) => {
+                    console.log(err);
+                    res.status(400).send({ message: err.message });
+                });
+            // res.status(200).send(objectToSend);
+        })
+        .catch((err) => {
+            console.log("err", err);
+            res.status(400).send({ message: err.message });
+        });
+})
+
+
+
+function getPlotsForExport(result, i) {
+    const plotsArray = result[i].plots;
+    const numberOfPlots = plotsArray.length;
+    const resultantArray = [];
+    for (let j = 0; j < numberOfPlots; j++) {
+        // console.log(plotsArray[j]);
+        resultantArray.push(plotsArray[j]);
+    }
+    return resultantArray;
+}
+
+
 export default router;
 
 
@@ -304,7 +670,9 @@ function getPlots(result, i) {
     const numberOfPlots = plotsArray.length;
     const resultantArray = [];
     for (let j = 0; j < numberOfPlots; j++) {
+        console.log(plotsArray[j]);
         resultantArray.push({
+            plotId: plotsArray[j]._id,
             plot: plotsArray[j].farmInformation.plotNumber,
             farmerId: result[i]._id,
             farmerName: result[i].personalInformation.name,
