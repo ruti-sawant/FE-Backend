@@ -22,30 +22,141 @@ router.post("/", (req, res) => {
                     tempData.push(row);
                 })
                 .on("end", async () => {
-                    tempData.forEach((row) => {
-                        console.log(row);
-                    });
-                    // axios.post(process.env.API_URL + "/mrlReports/postAll", {
-                    //     data: dataToSend
-                    // }, {
-                    //     headers: {
-                    //         'Content-Type': 'application/json',
-                    //         'apiid': process.env.API_KEY
-                    //     }
-                    // })
-                    //     .then((data) => {
-                    //         console.log(data.data);
-                    //         res.status(200).send(data.data);
-                    //     })
-                    //     .catch((err) => {
-                    //         console.log(err);
-                    //         if (err.response && err.response.data && err.response.data.message) {
-                    //             res.status(400).send({ message: err.response.data.message });
-                    //         } else {
-                    //             res.status(400).send({ message: err.message });
-                    //         }
-                    //     });
+                    await axios.get(process.env.API_URL + "/farmers", {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apiid': process.env.API_KEY
+                        }
+                    })
+                        .then(async (data) => {
+                            // console.log(data.data);
+                            axios.get(process.env.API_URL + "/seasonalData", {
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'apiid': process.env.API_KEY
+                                }
+                            })
+                                .then(async (seasonalData) => {
+                                    const farmerDataReceived = data.data;
+                                    const seasonalDataReceived = seasonalData.data;
+                                    const farmerMapping = new Map();
+                                    for (let i = 0; i < farmerDataReceived.length; i++) {
+                                        for (let j = 0; j < farmerDataReceived[i].plots.length; j++) {
+                                            farmerMapping.set(farmerDataReceived[i].plots[j].farmInformation.MHCode, {
+                                                farmerId: farmerDataReceived[i]._id,
+                                                GGN: farmerDataReceived[i].personalInformation.GGN,
+                                                MHCode: farmerDataReceived[i].plots[j].farmInformation.MHCode,
+                                                plot: farmerDataReceived[i].plots[j].farmInformation.plotNumber
+                                            });
+                                        }
+                                    }
+                                    const seasonalDataMapping = new Map();
+                                    for (let i = 0; i < seasonalDataReceived.length; i++) {
+                                        if (seasonalDataMapping.has(seasonalDataReceived[i].MHCode) && new Date(seasonalDataMapping.get(seasonalDataReceived[i].MHCode)) > new Date(seasonalDataReceived[i].cropMilestoneDates.fruitPruning)) {
+                                            continue;
+                                        }
+                                        seasonalDataMapping.set(seasonalDataReceived[i].MHCode, seasonalDataReceived[i].cropMilestoneDates.fruitPruning);
+                                    }
+                                    for (let key of seasonalDataMapping.keys()) {
+                                        if (farmerMapping.has(key))
+                                            farmerMapping.get(key).proposedDate = seasonalDataMapping.get(key);
+                                    }
+                                    // console.log("tempData");
+                                    console.log(farmerMapping);
 
+                                    // to get Difference in date using Date.parse() and adding number of seconds to it to get expected date.
+
+
+
+                                    const curatedDiaries = [];
+                                    tempData.forEach((row) => {
+                                        const diaryObject = {}
+                                        diaryObject.day = row["day"];
+                                        const sprayArray = [];
+                                        for (let i = 1; i <= 5; i++) {
+                                            const sprayObject = {};
+                                            if (row["sprayCategory" + i] !== "") {
+                                                sprayObject.category = row["sprayCategory" + i];
+                                                sprayObject.chemical = row["sprayChemical" + i];
+                                                sprayObject.quantity = row["sprayQuantity" + i];
+                                                sprayObject.imageUrl = row["sprayImageUrl" + i];
+                                                sprayArray.push(sprayObject);
+                                            }
+                                        }
+                                        diaryObject.spray = { details: sprayArray };
+
+
+                                        const irrigationArray = [];
+                                        for (let i = 1; i <= 5; i++) {
+                                            const irrigationObject = {};
+                                            if (row["irrigationFertilizer" + i] !== "") {
+                                                irrigationObject.fertilizer = row["irrigationFertilizer" + i];
+                                                irrigationObject.quantity = row["irrigationQuantity" + i];
+                                                irrigationObject.imageUrl = row["irrigationImageUrl" + i];
+                                                irrigationArray.push(irrigationObject);
+                                            }
+                                        }
+                                        diaryObject.irrigation = {
+                                            numberOfHours: row["irrigationHours"],
+                                            details: irrigationArray
+                                        };
+
+
+                                        const farmWorkArray = [];
+                                        for (let i = 1; i <= 5; i++) {
+                                            const farmWorkObject = {};
+                                            if (row["farmWork" + i] !== "") {
+                                                farmWorkObject.work = row["farmWork" + i];
+                                                farmWorkObject.comments = row["farmWorkComment" + i];
+                                                farmWorkObject.imageUrl = row["farmWorkImageUrl" + i];
+                                                farmWorkArray.push(farmWorkObject);
+                                            }
+                                        }
+                                        diaryObject.farmWork = { details: farmWorkArray };
+
+
+                                        const soilWorkArray = [];
+                                        for (let i = 1; i <= 5; i++) {
+                                            const soilWorkObject = {};
+                                            if (row["soilWork" + i] !== "") {
+                                                soilWorkObject.work = row["soilWork" + i];
+                                                soilWorkObject.area = row["soilWorkArea" + i];
+                                                soilWorkObject.imageUrl = row["soilWorkImageUrl" + i];
+                                                soilWorkArray.push(soilWorkObject);
+                                            }
+                                        }
+                                        diaryObject.soilWork = { details: soilWorkArray };
+
+
+                                        const maintenanceWorkArray = [];
+                                        for (let i = 1; i <= 5; i++) {
+                                            const maintenanceWorkObject = {};
+                                            if (row["maintenanceWorkItem" + i] !== "") {
+                                                maintenanceWorkObject.work = row["maintenanceWorkItem" + i];
+                                                maintenanceWorkObject.comments = row["maintenanceWorkComment" + i];
+                                                maintenanceWorkObject.imageUrl = row["maintenanceWorkImageUrl" + i];
+                                                maintenanceWorkArray.push(maintenanceWorkObject);
+                                            }
+                                        }
+                                        diaryObject.maintenanceWork = { details: maintenanceWorkArray };
+
+
+                                        diaryObject.notes = row["notes"];
+
+
+                                        curatedDiaries.push(diaryObject);
+                                    });
+                                    res.status(200).send(curatedDiaries);
+                                })
+                                .catch((err) => {
+                                    console.log("seasonalData", err);
+                                    res.status(400).send({ message: err.message });
+                                });
+                        })
+                        .catch((err) => {
+                            console.log("farmer", err);
+                            res.status(400).send({ message: err.message });
+                        });
                 });
         } catch (err) {
             console.log(err);
@@ -72,55 +183,7 @@ function getAllFarmers() {
     })
         .then((data) => {
             const result = data.data;
-            axios.get(process.env.API_URL + "/seasonalData", {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'apiid': process.env.API_KEY
-                }
-            })
-                .then(async (data) => {
 
-                    //for extraction of seasonalData
-                    const seasonalData = data.data;
-                    const seasonalDataLength = seasonalData.length;
-                    const mhcodeSeasonaldata = new Map();
-                    for (let i = 0; i < seasonalDataLength; i++) {
-                        if (!mhcodeSeasonaldata.has(seasonalData[i].MHCode)) {
-                            mhcodeSeasonaldata.set(seasonalData[i].MHCode, [i]);
-                        } else {
-                            mhcodeSeasonaldata.get(seasonalData[i].MHCode).push(i);
-                        }
-                    }
-
-                    //for extraction of farmer data.
-                    let resultLength = result.length;
-                    let objectToSend = [];
-                    for (let i = 0; i < resultLength; i++) {
-                        const farmerObject = {};
-                        farmerObject.farmerId = result[i]._id;
-                        farmerObject.personalInformation = result[i].personalInformation;
-                        const plots = getPlots(result, i);
-                        for (let i = 0; i < plots.length; i++) {
-                            farmerObject.plot = plots[i];
-                            const seasonalDataIndices = mhcodeSeasonaldata.get(plots[i].farmInformation.MHCode);
-                            if (seasonalDataIndices && seasonalDataIndices.length > 0) {
-                                for (let j = 0; j < seasonalDataIndices.length; j++) {
-                                    farmerObject.seasonalData = seasonalData[seasonalDataIndices[j]];
-                                    objectToSend.push({ ...farmerObject });
-                                }
-                            } else {
-                                objectToSend.push({ ...farmerObject });
-                            }
-                        }
-                    }
-
-
-
-                })
-                .catch((err) => {
-                    // res.status(400).send({ message: err.message });
-                });
-            // res.status(200).send(objectToSend);
         })
         .catch((err) => {
             console.log("err", err);

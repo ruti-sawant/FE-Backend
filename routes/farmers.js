@@ -462,7 +462,7 @@ router.get("/exportFarmers", (req, res) => {
                             tempObject.pincode = "";
                         }
                         if (objectToSend[i].plot && objectToSend[i].plot.other && objectToSend[i].plot.other.tags && objectToSend[i].plot.other.tags.length > 0) {
-                            tempObject.tags = objectToSend[i].plot.other.tags.join(",");
+                            tempObject.tags = objectToSend[i].plot.other.tags.join(" , ");
                         } else {
                             tempObject.tags = "";
                         }
@@ -486,28 +486,28 @@ router.get("/exportFarmers", (req, res) => {
                         } else {
                             tempObject.year = "";
                         }
-                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.cropMilestoneDates && objectToSend[i].seasonalData.cropMilestoneDates.plantation) {
-                            tempObject.plantationDate = objectToSend[i].seasonalData.cropMilestoneDates.plantation;
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.cropMilestoneDates && objectToSend[i].seasonalData.cropMilestoneDates.plantation && objectToSend[i].seasonalData.cropMilestoneDates.plantation.length > 0) {
+                            tempObject.plantationDate = objectToSend[i].seasonalData.cropMilestoneDates.plantation.substr(8, 2) + "/" + objectToSend[i].seasonalData.cropMilestoneDates.plantation.substr(5, 2) + "/" + objectToSend[i].seasonalData.cropMilestoneDates.plantation.substr(0, 4);
                         } else {
                             tempObject.plantationDate = "";
                         }
-                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.cropMilestoneDates && objectToSend[i].seasonalData.cropMilestoneDates.foundationPruning) {
-                            tempObject.foundationPruningDate = objectToSend[i].seasonalData.cropMilestoneDates.foundationPruning;
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.cropMilestoneDates && objectToSend[i].seasonalData.cropMilestoneDates.foundationPruning && objectToSend[i].seasonalData.cropMilestoneDates.foundationPruning.length > 0) {
+                            tempObject.foundationPruningDate = objectToSend[i].seasonalData.cropMilestoneDates.foundationPruning.substr(8, 2) + "/" + objectToSend[i].seasonalData.cropMilestoneDates.foundationPruning.substr(5, 2) + "/" + objectToSend[i].seasonalData.cropMilestoneDates.foundationPruning.substr(0, 4);
                         } else {
                             tempObject.foundationPruningDate = "";
                         }
-                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.cropMilestoneDates && objectToSend[i].seasonalData.cropMilestoneDates.fruitPruning) {
-                            tempObject.fruitPruningDate = objectToSend[i].seasonalData.cropMilestoneDates.fruitPruning;
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.cropMilestoneDates && objectToSend[i].seasonalData.cropMilestoneDates.fruitPruning && objectToSend[i].seasonalData.cropMilestoneDates.fruitPruning.length > 0) {
+                            tempObject.fruitPruningDate = objectToSend[i].seasonalData.cropMilestoneDates.fruitPruning.substr(8, 2) + "/" + objectToSend[i].seasonalData.cropMilestoneDates.fruitPruning.substr(5, 2) + "/" + objectToSend[i].seasonalData.cropMilestoneDates.fruitPruning.substr(0, 4);
                         } else {
                             tempObject.fruitPruningDate = "";
                         }
-                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.cropMilestoneDates && objectToSend[i].seasonalData.cropMilestoneDates.readyToHarvest) {
-                            tempObject.readyToHarvestDate = objectToSend[i].seasonalData.cropMilestoneDates.readyToHarvest;
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.cropMilestoneDates && objectToSend[i].seasonalData.cropMilestoneDates.readyToHarvest && objectToSend[i].seasonalData.cropMilestoneDates.readyToHarvest.length > 0) {
+                            tempObject.readyToHarvestDate = objectToSend[i].seasonalData.cropMilestoneDates.readyToHarvest.substr(8, 2) + "/" + objectToSend[i].seasonalData.cropMilestoneDates.readyToHarvest.substr(5, 2) + "/" + objectToSend[i].seasonalData.cropMilestoneDates.readyToHarvest.substr(0, 4);
                         } else {
                             tempObject.readyToHarvestDate = "";
                         }
-                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.cropMilestoneDates && objectToSend[i].seasonalData.cropMilestoneDates.actualHarvest) {
-                            tempObject.actualHarvestDate = objectToSend[i].seasonalData.cropMilestoneDates.actualHarvest;
+                        if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.cropMilestoneDates && objectToSend[i].seasonalData.cropMilestoneDates.actualHarvest && objectToSend[i].seasonalData.cropMilestoneDates.actualHarvest.length > 0) {
+                            tempObject.actualHarvestDate = objectToSend[i].seasonalData.cropMilestoneDates.actualHarvest.substr(8, 2) + "/" + objectToSend[i].seasonalData.cropMilestoneDates.actualHarvest.substr(5, 2) + "/" + objectToSend[i].seasonalData.cropMilestoneDates.actualHarvest.substr(0, 4);
                         } else {
                             tempObject.actualHarvestDate = "";
                         }
@@ -557,27 +557,27 @@ router.get("/exportFarmers", (req, res) => {
                             tempObject.inwardQClinks = "";
                         }
                         if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.qualityJotforms && objectToSend[i].seasonalData.qualityJotforms.knittingQCLinks) {
-                            tempObject.knittingQCLinks = objectToSend[i].seasonalData.qualityJotforms.knittingQCLinks;
+                            tempObject.knittingQCLinks = objectToSend[i].seasonalData.qualityJotforms.knittingQCLinks.join(" , ");
                         } else {
                             tempObject.knittingQCLinks = "";
                         }
                         if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.qualityJotforms && objectToSend[i].seasonalData.qualityJotforms.packingQCLinks) {
-                            tempObject.packingQCLinks = objectToSend[i].seasonalData.qualityJotforms.packingQCLinks;
+                            tempObject.packingQCLinks = objectToSend[i].seasonalData.qualityJotforms.packingQCLinks.join(" , ");
                         } else {
                             tempObject.packingQCLinks = "";
                         }
                         if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.qualityJotforms && objectToSend[i].seasonalData.qualityJotforms.FGQCLinks) {
-                            tempObject.FGQCLinks = objectToSend[i].seasonalData.qualityJotforms.FGQCLinks;
+                            tempObject.FGQCLinks = objectToSend[i].seasonalData.qualityJotforms.FGQCLinks.join(" , ");
                         } else {
                             tempObject.FGQCLinks = "";
                         }
                         if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.qualityJotforms && objectToSend[i].seasonalData.qualityJotforms.onArrivalQCLinks) {
-                            tempObject.onArrivalQCLinks = objectToSend[i].seasonalData.qualityJotforms.onArrivalQCLinks;
+                            tempObject.onArrivalQCLinks = objectToSend[i].seasonalData.qualityJotforms.onArrivalQCLinks.join(" , ");
                         } else {
                             tempObject.onArrivalQCLinks = "";
                         }
                         if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.primaryQualityIssuesFaced && objectToSend[i].seasonalData.primaryQualityIssuesFaced.length > 0) {
-                            tempObject.primaryQualityIssuesFaced = objectToSend[i].seasonalData.primaryQualityIssuesFaced.join(",");
+                            tempObject.primaryQualityIssuesFaced = objectToSend[i].seasonalData.primaryQualityIssuesFaced.join(" , ");
                         } else {
                             tempObject.primaryQualityIssuesFaced = "";
                         }

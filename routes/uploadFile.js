@@ -61,7 +61,8 @@ router.post("/:folderName", async (req, res) => {
 });
 
 router.delete("/", async (req, res) => {
-    // console.log(req.body);
+    console.log(req.body);
+    console.log(req.body.id);
     await deleteFile(req.body.id);
     res.status(200).send({ data: "deleted" });
 });
