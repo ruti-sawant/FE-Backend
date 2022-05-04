@@ -8,10 +8,12 @@ import { Parser } from "json2csv";
 
 const router = express.Router();
 
-
 router.post("/", (req, res) => {
-
-    if (req.files) {
+    let MHCodesArray = [];
+    if (req.body.MHCodes && req.body.MHCodes.length > 0) {
+        MHCodesArray = req.body.MHCodes.split(",");
+    }
+    if (req.files && MHCodesArray.length > 0) {
         const readable = Readable.from(req.files.sheet.data);
         const dataToSend = [];
         const tempData = [];
@@ -62,9 +64,7 @@ router.post("/", (req, res) => {
                                             farmerMapping.get(key).proposedDate = seasonalDataMapping.get(key);
                                     }
                                     // console.log("tempData");
-                                    console.log(farmerMapping);
-
-                                    // to get Difference in date using Date.parse() and adding number of seconds to it to get expected date.
+                                    // console.log(farmerMapping);
 
 
 
@@ -146,7 +146,51 @@ router.post("/", (req, res) => {
 
                                         curatedDiaries.push(diaryObject);
                                     });
-                                    res.status(200).send(curatedDiaries);
+
+                                    const completedMHCodes = [];
+                                    for (let x = 0; x < MHCodesArray.length; x++) {
+                                        const MHCode = MHCodesArray[x];
+                                        console.log(MHCode);
+                                        const diariesForFarmer = [];
+                                        if (farmerMapping.has(MHCode)) {
+                                            const value = farmerMapping.get(MHCode);
+                                            const startDate = String(value.proposedDate);
+                                            //cancel for invalid date.
+                                            if (!startDate || startDate === "" || startDate === "undefined" || startDate === "null")
+                                                return;
+                                            for (let i = 0; i < curatedDiaries.length; i++) {
+                                                // to get Difference in date using Date.parse() and adding number of seconds to it to get expected date.
+
+                                                const newDate = new Date(Date.parse(startDate) + (Number(curatedDiaries[i].day) * 86400000));
+                                                console.log(startDate, newDate, curatedDiaries[i].day);
+                                                value.proposedDate = newDate.toISOString();
+
+                                                const diaryObject = { ...curatedDiaries[i], ...value };
+                                                delete diaryObject.day;
+                                                diariesForFarmer.push(diaryObject);
+                                            }
+                                            await axios.post(process.env.API_URL + "/dailyDiary/all", {
+                                                data: diariesForFarmer
+                                            }, {
+                                                headers: {
+                                                    'Content-Type': 'application/json',
+                                                    'apiid': process.env.API_KEY
+                                                }
+                                            })
+                                                .then((data) => {
+                                                    // res.status(200).send(data.data);
+                                                    console.log(data.data);
+                                                    console.log(MHCode, "Completed inside");
+                                                })
+                                                .catch((err) => {
+                                                    res.status(400).send({ message: err.message });
+                                                });
+                                            console.log(MHCode, "Completed");
+                                            completedMHCodes.push(MHCode);
+                                        }
+                                    }
+                                    console.log(completedMHCodes);
+                                    res.status(200).send({ message: "All Daily Diaries inserted " + completedMHCodes.join(" , ") });
                                 })
                                 .catch((err) => {
                                     console.log("seasonalData", err);
