@@ -157,7 +157,7 @@ router.post("/", (req, res) => {
                                             const startDate = String(value.proposedDate);
                                             //cancel for invalid date.
                                             if (!startDate || startDate === "" || startDate === "undefined" || startDate === "null")
-                                                return;
+                                                continue;
                                             for (let i = 0; i < curatedDiaries.length; i++) {
                                                 // to get Difference in date using Date.parse() and adding number of seconds to it to get expected date.
 
