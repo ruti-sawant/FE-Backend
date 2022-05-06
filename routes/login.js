@@ -55,6 +55,22 @@ router.get("/", middleware, (req, res) => {
     }
 });
 
+router.get("/usernames", middleware, (req, res) => {
+    axios.get(process.env.API_URL + "/login/usernames", {
+        headers: {
+            'Content-Type': 'application/json',
+            'apiid': process.env.API_KEY
+        }
+    })
+        .then((data) => {
+            console.log(data.data);
+            res.status(200).send(data.data);
+        })
+        .catch((err) => {
+            console.log(err);
+            res.status(500).send({ message: err.message });
+        })
+});
 
 //to login user and check in database.
 router.post("/", middleware, (req, res) => {
