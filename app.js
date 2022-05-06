@@ -54,6 +54,8 @@ app.listen(port, () => {
   console.log("Server started on port ", port);
 });
 
+
+app.options("/", cors());
 //route to fetch filters from database.
 app.get("/filters", middleware, (req, res) => {
   axios
