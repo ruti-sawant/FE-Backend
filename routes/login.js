@@ -72,6 +72,26 @@ router.get("/usernames", middleware, (req, res) => {
         })
 });
 
+router.post("/forgotPassword", middleware, (req, res) => {
+    const data = req.body;
+    axios.post(process.env.API_URL + "/login/forgotPassword", {
+        data
+    }, {
+        headers: {
+            'Content-Type': 'application/json',
+            'apiid': process.env.API_KEY
+        }
+    })
+        .then((data) => {
+            console.log("broadcast inserted", data.data);
+            res.status(200).send({ message: "password updated successfully" });
+        })
+        .catch((err) => {
+            console.log("Broadcast insert err", err);
+            res.status(400).send({ message: err.message });
+        });
+});
+
 //to login user and check in database.
 router.post("/", middleware, (req, res) => {
     console.log(req.get('host'));
