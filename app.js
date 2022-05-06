@@ -18,6 +18,8 @@ app.use(cors(corsOptions));
 app.use(fileUpload());
 app.use(express.json());
 app.use(cookieParser());
+app.use(middleware);
+
 
 //imports for routes.
 import uploadFile from "./routes/uploadFile.js";
