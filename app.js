@@ -10,7 +10,7 @@ const app = express();
 //to allow get from anywhere.
 const corsOptions = {
   'Access-Control-Allow-Origin': '*',
-  origin: ['*'],
+  origin: '*',
   credentials: true,            //access-control-allow-credentials:true
 }
 app.use(cors(corsOptions));
