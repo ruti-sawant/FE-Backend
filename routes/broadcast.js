@@ -6,6 +6,7 @@ const router = express.Router();
 
 import middleware from '../middleware.js';
 
+//method to get all broadcasts data.
 router.get("/", middleware, (req, res) => {
     axios.get(process.env.API_URL + "/broadcasts", {
         headers: {
@@ -23,6 +24,8 @@ router.get("/", middleware, (req, res) => {
         });
 });
 
+
+// method to get single broadcast data by its id.
 router.get("/:broadcastId", middleware, (req, res) => {
     const broadcastId = req.params.broadcastId;
     axios.get(process.env.API_URL + "/broadcasts/" + broadcastId, {
@@ -41,6 +44,7 @@ router.get("/:broadcastId", middleware, (req, res) => {
         });
 });
 
+//method to get all broadcasts for any farmer by farmerId.
 router.get("/farmer/:farmerId", middleware, (req, res) => {
     const farmerId = req.params.farmerId;
     axios.get(process.env.API_URL + "/broadcasts/farmer/" + farmerId, {
@@ -59,6 +63,7 @@ router.get("/farmer/:farmerId", middleware, (req, res) => {
         });
 });
 
+// method to add broadcast
 router.post("/", middleware, (req, res) => {
     const data = req.body;
     axios.post(process.env.API_URL + "/broadcasts", {
@@ -79,6 +84,7 @@ router.post("/", middleware, (req, res) => {
         });
 });
 
+//method to add question in broadcast by broadcast id.
 router.post("/insertQuestion/:broadcastId", middleware, (req, res) => {
     const data = req.body;
     const broadcastId = req.params.broadcastId;
@@ -100,6 +106,8 @@ router.post("/insertQuestion/:broadcastId", middleware, (req, res) => {
         });
 });
 
+
+//method to add answer for a question in particular broadcast by broadcast id and question id.
 router.post("/insertAnswer/:broadcastId/:chatId", middleware, (req, res) => {
     const data = req.body;
     const broadcastId = req.params.broadcastId;
@@ -122,6 +130,7 @@ router.post("/insertAnswer/:broadcastId/:chatId", middleware, (req, res) => {
         });
 });
 
+//method to delete broadcast by its broadcastId.
 router.post("/delete/:broadcastId", middleware, (req, res) => {
     const broadcastId = req.params.broadcastId;
     axios.delete(process.env.API_URL + "/broadcasts/" + broadcastId, {

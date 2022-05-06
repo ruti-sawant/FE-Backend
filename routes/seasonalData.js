@@ -4,6 +4,7 @@ const router = express.Router();
 
 import middleware from '../middleware.js';
 
+//to get all seasonal data's.
 router.get("/", middleware, (req, res) => {
     axios.get(process.env.API_URL + "/seasonalData", {
         headers: {
@@ -19,6 +20,7 @@ router.get("/", middleware, (req, res) => {
         });
 });
 
+//to get seasonal data's by plotId.
 router.get("/plots/:plotId", middleware, (req, res) => {
     const plotId = req.params.plotId;
     axios.get(process.env.API_URL + "/seasonalData/farmers/plots/" + plotId, {
@@ -35,6 +37,8 @@ router.get("/plots/:plotId", middleware, (req, res) => {
         });
 });
 
+
+//to add new seasonal data.
 router.post("/", middleware, (req, res) => {
     const data = req.body;
     console.log("post body", req.body);
@@ -56,6 +60,7 @@ router.post("/", middleware, (req, res) => {
         });
 });
 
+//to edit seasonal data by its id.
 router.post("/edit/:seasonalDataId", middleware, (req, res) => {
     const seasonalDataId = req.params.seasonalDataId;
     const data = req.body;
@@ -77,6 +82,7 @@ router.post("/edit/:seasonalDataId", middleware, (req, res) => {
         });
 });
 
+//to delete seasonal data by year.
 router.post("/delete/deleteByYear/:year", middleware, (req, res) => {
     const year = req.params.year;
     axios.delete(process.env.API_URL + "/seasonalData/deleteByYear/data/" + year, {
@@ -95,6 +101,7 @@ router.post("/delete/deleteByYear/:year", middleware, (req, res) => {
         });
 });
 
+//to delete seasonal data by plotId.
 router.post("/delete/deleteByPlot/:plotId", middleware, (req, res) => {
     const plotId = req.params.plotId;
     axios.delete(process.env.API_URL + "/seasonalData/deleteByPlot/data/" + plotId, {
@@ -114,6 +121,7 @@ router.post("/delete/deleteByPlot/:plotId", middleware, (req, res) => {
 });
 
 
+// to delete seasonal data by farmerId
 router.post("/delete/deleteByFarmer/:farmerId", middleware, (req, res) => {
     const farmerId = req.params.farmerId;
     axios.delete(process.env.API_URL + "/seasonalData/" + farmerId, {
@@ -132,6 +140,7 @@ router.post("/delete/deleteByFarmer/:farmerId", middleware, (req, res) => {
         });
 });
 
+//to delete seasonal data by id.
 router.post("/delete/deleteBySeasonalId/:seasonalId", middleware, (req, res) => {
     const seasonalId = req.params.seasonalId;
     axios.delete(process.env.API_URL + "/seasonalData/data/" + seasonalId, {

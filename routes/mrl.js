@@ -9,6 +9,7 @@ const router = express.Router();
 
 import middleware from '../middleware.js';
 
+//to get all mrlReports.
 router.get("", middleware, (req, res) => {
     axios.get(process.env.API_URL + "/mrlReports", {
         headers: {
@@ -26,6 +27,7 @@ router.get("", middleware, (req, res) => {
         });
 });
 
+//to get mrlReport by id.
 router.get("/data/:mrlId", middleware, (req, res) => {
     const mrlId = req.params.mrlId;
     axios.get(process.env.API_URL + "/mrlReports/data/" + mrlId, {
@@ -44,6 +46,8 @@ router.get("/data/:mrlId", middleware, (req, res) => {
         });
 });
 
+
+//to get mrlReports by MHCode.
 router.get("/MHCode/:MHCode", middleware, (req, res) => {
     const MHCode = req.params.MHCode;
     axios.get(process.env.API_URL + "/mrlReports/MHCode/" + MHCode, {
@@ -62,6 +66,7 @@ router.get("/MHCode/:MHCode", middleware, (req, res) => {
         });
 });
 
+//to get mrlReport by sampleNumber
 router.get("/sampleNumber/:sampleNumber", middleware, (req, res) => {
     const sampleNumber = req.params.sampleNumber;
     axios.get(process.env.API_URL + "/mrlReports/sampleNumber/" + sampleNumber, {
@@ -80,7 +85,7 @@ router.get("/sampleNumber/:sampleNumber", middleware, (req, res) => {
         });
 });
 
-
+//to add new mrl report.
 router.post("/", middleware, (req, res) => {
     const data = req.body;
     axios.post(process.env.API_URL + "/mrlReports", {
@@ -102,7 +107,7 @@ router.post("/", middleware, (req, res) => {
 });
 
 
-//function added by Harshal
+
 router.post("/uploadCSV", middleware, (req, res) => {
     if (req.files) {
         const readable = Readable.from(req.files.allMRLReports.data);
@@ -115,6 +120,7 @@ router.post("/uploadCSV", middleware, (req, res) => {
                     tempData.push(row);
                 })
                 .on("end", () => {
+                    //sort data by firstly sampleNumber if equal then by year 
                     tempData.sort((a, b) =>
                         a.sampleNumber > b.sampleNumber
                             ? 1
@@ -124,10 +130,11 @@ router.post("/uploadCSV", middleware, (req, res) => {
                                     : -1
                                 : -1
                     );
+
                     for (let i = 0; i < tempData.length; i++) {
                         let flg = 0;
                         for (let j = 0; j < dataToSend.length; j++) {
-                            // Pushing new Chemical in existing Item
+                            // Pushing new Chemical in existing Item if sampleNumber and year is same.
                             if (
                                 tempData[i].sampleNumber === dataToSend[j].sampleNumber &&
                                 tempData[i].year === dataToSend[j].year
@@ -143,14 +150,13 @@ router.post("/uploadCSV", middleware, (req, res) => {
                                     intake: tempData[i].intake,
                                     ArFDPercent: tempData[i].ArFDPercent,
                                     remark: tempData[i].remark,
-                                    // partOfAnnex9: tempData[i].partOfAnnex9,
-                                    // redList: tempData[i].redList,
                                 };
                                 dataToSend[j].chemicals.push(newChemical);
                             }
                         }
-
+                        // if chemical is not added to any list then add it to new list.
                         if (flg === 0) {
+                            //creating new data object.
                             //Pushing new Item
                             let newChemical = {
                                 srNo: tempData[i].srNo,
@@ -162,8 +168,6 @@ router.post("/uploadCSV", middleware, (req, res) => {
                                 intake: tempData[i].intake,
                                 ArFDPercent: tempData[i].ArFDPercent,
                                 remark: tempData[i].remark,
-                                // partOfAnnex9: tempData[i].partOfAnnex9,
-                                // redList: tempData[i].redList,
                             };
                             let splittedDate = tempData[i].dateOfSampling.split("/");
                             if (splittedDate.length != 3)
@@ -191,7 +195,6 @@ router.post("/uploadCSV", middleware, (req, res) => {
                             dataToSend.push(newItem);
                         }
                     }
-                    // console.log("In the end", dataToSend);
                     //method to post data to API server.
                     axios.post(process.env.API_URL + "/mrlReports/postAll", {
                         data: dataToSend
@@ -225,7 +228,7 @@ router.post("/uploadCSV", middleware, (req, res) => {
     }
 });
 
-
+//to delete mrlReport by its id.
 router.post("/delete/:mrlId", middleware, (req, res) => {
     const mrlId = req.params.mrlId;
     axios.delete(process.env.API_URL + "/mrlReports/" + mrlId, {
@@ -244,6 +247,8 @@ router.post("/delete/:mrlId", middleware, (req, res) => {
         });
 });
 
+
+// to delete mrlReports by MHCode and year
 router.post("/delete/MHCode/:MHCode/:year?", middleware, (req, res) => {
     const MHCode = req.params.MHCode;
     const year = req.params.year;
@@ -287,6 +292,7 @@ router.get("/approvedChemicals", middleware, (req, res) => {
         });
 });
 
+//upload approved chemicals from csv.
 router.post("/uploadApprovedChemicals", middleware, (req, res) => {
     if (req.files) {
         const readable = Readable.from(req.files.approvedChemicals.data);
@@ -294,6 +300,7 @@ router.post("/uploadApprovedChemicals", middleware, (req, res) => {
         try {
             readable.pipe(csv())
                 .on('data', (row) => {
+                    // extract data from csv
                     const chemical = {
                         srNo: row["srNo"],
                         chemicalName: row["chemicalName"],
@@ -303,6 +310,7 @@ router.post("/uploadApprovedChemicals", middleware, (req, res) => {
                     dataToSend.push(chemical);
                 })
                 .on('end', () => {
+                    //push data to database api.
                     axios.post(process.env.API_URL + "/mrlReports/approvedChemicals", {
                         data: dataToSend
                     }, {
@@ -332,7 +340,7 @@ router.post("/uploadApprovedChemicals", middleware, (req, res) => {
 
 
 
-//handling banned chemicals.
+//to get banned chemicals.
 router.get("/bannedChemicals", middleware, (req, res) => {
     axios.get(process.env.API_URL + "/mrlReports/bannedChemicals", {
         headers: {
@@ -350,6 +358,7 @@ router.get("/bannedChemicals", middleware, (req, res) => {
         });
 });
 
+//upload banned chemicals from csv.
 router.post("/uploadBannedChemicals", middleware, (req, res) => {
     if (req.files) {
         const readable = Readable.from(req.files.bannedChemicals.data);
@@ -357,6 +366,7 @@ router.post("/uploadBannedChemicals", middleware, (req, res) => {
         try {
             readable.pipe(csv())
                 .on('data', (row) => {
+                    //get data from csv.
                     const chemical = {
                         srNo: row["srNo"],
                         chemicalName: row["chemicalName"],
@@ -369,21 +379,16 @@ router.post("/uploadBannedChemicals", middleware, (req, res) => {
                     const global2000 = row["global2000"].toUpperCase().match("(RED)?(YELLOW)?(ORANGE)?")[0];
                     const EUMRL = row["EUMRL"].toUpperCase().match("(RED)?(YELLOW)?(ORANGE)?")[0];
 
-                    // if (fairTrade_PPO && fairTrade_PPO.length > 0)
                     chemical.fairTrade_PPO = fairTrade_PPO
-                    // if (EUG_Germany && EUG_Germany.length > 0)
                     chemical.EUG_Germany = EUG_Germany
-                    // if (MMUK_MS && MMUK_MS.length > 0)
                     chemical.MMUK_MS = MMUK_MS
-                    // if (MMUK_COOP_UK && MMUK_COOP_UK.length > 0)
                     chemical.MMUK_COOP_UK = MMUK_COOP_UK
-                    // if (global2000 && global2000.length > 0)
                     chemical.global2000 = global2000
-                    // if (EUMRL && EUMRL.length > 0)
                     chemical.EUMRL = EUMRL
                     dataToSend.push(chemical);
                 })
                 .on('end', () => {
+                    //push data to database api.
                     axios.post(process.env.API_URL + "/mrlReports/bannedChemicals", {
                         data: dataToSend
                     }, {

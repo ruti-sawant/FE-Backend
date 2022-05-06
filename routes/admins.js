@@ -6,7 +6,7 @@ import middleware from '../middleware.js';
 const router = express.Router();
 
 
-
+//method to get all admins data.
 router.get("/", middleware, (req, res) => {
     axios.get(process.env.API_URL + "/admins", {
         headers: {
@@ -24,6 +24,7 @@ router.get("/", middleware, (req, res) => {
         });
 });
 
+//method to get a specific admin data by its id.
 router.get("/:adminId", middleware, (req, res) => {
     const adminId = req.params.adminId;
     axios.get(process.env.API_URL + "/admins/" + adminId, {
@@ -42,6 +43,8 @@ router.get("/:adminId", middleware, (req, res) => {
         });
 });
 
+
+//method to post or add new Admin.
 router.post("/", middleware, (req, res) => {
     const data = req.body;
     axios.post(process.env.API_URL + "/admins", {
@@ -63,6 +66,8 @@ router.post("/", middleware, (req, res) => {
         });
 });
 
+
+//method to update admin data by its id.
 router.patch("/:adminId", middleware, (req, res) => {
     const adminId = req.params.adminId;
     const data = req.body;
@@ -84,6 +89,8 @@ router.patch("/:adminId", middleware, (req, res) => {
         });
 });
 
+
+//method to delete admin data by its id.
 router.delete("/:adminId", middleware, (req, res) => {
     const adminId = req.params.adminId;
     axios.delete(process.env.API_URL + "/admins/" + adminId, {
@@ -101,4 +108,6 @@ router.delete("/:adminId", middleware, (req, res) => {
             res.status(400).send({ message: err.message });
         });
 });
+
+
 export default router;

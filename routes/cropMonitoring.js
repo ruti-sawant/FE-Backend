@@ -6,8 +6,8 @@ const router = express.Router();
 
 import middleware from '../middleware.js';
 
-export default router;
 
+//to get all crop monitoring data.  
 router.get("/", middleware, (req, res) => {
   axios
     .get(process.env.API_URL + "/cropMonitoring", {
@@ -26,7 +26,7 @@ router.get("/", middleware, (req, res) => {
     });
 });
 
-// /cropMonitoring/data/<monitoringId>
+//to get data of any one crop monitoring by its monitoringId.
 router.get("/data/:monitoringId", middleware, (req, res) => {
   const monitoringId = req.params.monitoringId;
   axios
@@ -46,7 +46,7 @@ router.get("/data/:monitoringId", middleware, (req, res) => {
     });
 });
 
-// /cropMonitoring/MHCode/<MHCode>
+//to get data of crop monitoring for any plot by MHCode.
 router.get("/MHCode/:MHCode", middleware, (req, res) => {
   const MHCode = req.params.MHCode;
   axios
@@ -66,7 +66,7 @@ router.get("/MHCode/:MHCode", middleware, (req, res) => {
     });
 });
 
-// delete according MonitoringId
+//to delete crop monitoring data by its monitoringId.
 router.post("/delete/:monitoringId", middleware, (req, res) => {
   const monitoringId = req.params.monitoringId;
   axios
@@ -86,7 +86,7 @@ router.post("/delete/:monitoringId", middleware, (req, res) => {
     });
 });
 
-// delete according MHCode
+// to delete crop monitoring data of plots by its MHCode.
 router.post("/delete/MHCode/:MHCode", middleware, (req, res) => {
   const MHCode = req.params.MHCode;
   axios
@@ -105,3 +105,6 @@ router.post("/delete/MHCode/:MHCode", middleware, (req, res) => {
       res.status(400).send({ message: err.message });
     });
 });
+
+
+export default router;

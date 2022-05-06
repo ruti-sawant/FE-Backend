@@ -12,20 +12,24 @@ const router = express.Router();
 
 router.post("/", middleware, (req, res) => {
     let MHCodesArray = [];
+    // to get array of MHCodes from raw data as it is coming in form of comma separated string so split it.
     if (req.body.MHCodes && req.body.MHCodes.length > 0) {
         MHCodesArray = req.body.MHCodes.split(",");
     }
+    //only if file is uploaded and MHCode is not empty.
     if (req.files && MHCodesArray.length > 0) {
+        //create readable csv file stream.
         const readable = Readable.from(req.files.sheet.data);
-        const dataToSend = [];
         const tempData = [];
         try {
+            //reading data from csv.
             readable
                 .pipe(csv())
                 .on("data", (row) => {
                     tempData.push(row);
                 })
                 .on("end", async () => {
+                    //to fetch all farmers from database api.
                     await axios.get(process.env.API_URL + "/farmers", {
                         headers: {
                             'Content-Type': 'application/json',
@@ -33,7 +37,7 @@ router.post("/", middleware, (req, res) => {
                         }
                     })
                         .then(async (data) => {
-                            // console.log(data.data);
+                            //to get seasonal dats for all farmers.
                             axios.get(process.env.API_URL + "/seasonalData", {
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -41,11 +45,13 @@ router.post("/", middleware, (req, res) => {
                                 }
                             })
                                 .then(async (seasonalData) => {
-                                    const farmerDataReceived = data.data;
-                                    const seasonalDataReceived = seasonalData.data;
+                                    const farmerDataReceived = data.data;//farmers data from database api.
+                                    const seasonalDataReceived = seasonalData.data;//seasonal data from database api.
+                                    //map to store mapping of farmer MHCode and its other data.
                                     const farmerMapping = new Map();
                                     for (let i = 0; i < farmerDataReceived.length; i++) {
                                         for (let j = 0; j < farmerDataReceived[i].plots.length; j++) {
+                                            // setting data for MHCode
                                             farmerMapping.set(farmerDataReceived[i].plots[j].farmInformation.MHCode, {
                                                 farmerId: farmerDataReceived[i]._id,
                                                 GGN: farmerDataReceived[i].personalInformation.GGN,
@@ -54,24 +60,25 @@ router.post("/", middleware, (req, res) => {
                                             });
                                         }
                                     }
+                                    //map to store MHCode and its pruning date.
                                     const seasonalDataMapping = new Map();
                                     for (let i = 0; i < seasonalDataReceived.length; i++) {
+                                        // choosing largest pruning date from all seasonal data's pruning date.
                                         if (seasonalDataMapping.has(seasonalDataReceived[i].MHCode) && new Date(seasonalDataMapping.get(seasonalDataReceived[i].MHCode)) > new Date(seasonalDataReceived[i].cropMilestoneDates.fruitPruning)) {
                                             continue;
                                         }
                                         seasonalDataMapping.set(seasonalDataReceived[i].MHCode, seasonalDataReceived[i].cropMilestoneDates.fruitPruning);
                                     }
+                                    // assigning proposed date to each MHCode that is calculated from seasonal data.
                                     for (let key of seasonalDataMapping.keys()) {
                                         if (farmerMapping.has(key))
                                             farmerMapping.get(key).proposedDate = seasonalDataMapping.get(key);
                                     }
-                                    // console.log("tempData");
-                                    // console.log(farmerMapping);
 
-
-
+                                    //generate template for csv file and store it into curatedDiaries [].
                                     const curatedDiaries = [];
                                     tempData.forEach((row) => {
+                                        //this loop contains code to extract data from each row of csv.
                                         const diaryObject = {}
                                         diaryObject.day = row["day"];
                                         const sprayArray = [];
@@ -149,15 +156,17 @@ router.post("/", middleware, (req, res) => {
                                         curatedDiaries.push(diaryObject);
                                     });
 
-                                    const completedMHCodes = [];
+                                    const completedMHCodes = [];//to store MHCodes of completed 
+                                    //over each MHCode from frontend.
                                     for (let x = 0; x < MHCodesArray.length; x++) {
                                         const MHCode = MHCodesArray[x];
                                         console.log(MHCode);
                                         const diariesForFarmer = [];
+                                        //if farmer is found from database data.
                                         if (farmerMapping.has(MHCode)) {
                                             const value = farmerMapping.get(MHCode);
                                             const startDate = String(value.proposedDate);
-                                            //cancel for invalid date.
+                                            //if startDate or pruning is invalid then skip that row.
                                             if (!startDate || startDate === "" || startDate === "undefined" || startDate === "null")
                                                 continue;
                                             for (let i = 0; i < curatedDiaries.length; i++) {
@@ -165,12 +174,15 @@ router.post("/", middleware, (req, res) => {
 
                                                 const newDate = new Date(Date.parse(startDate) + (Number(curatedDiaries[i].day) * 86400000));
                                                 console.log(startDate, newDate, curatedDiaries[i].day);
+                                                //assign new calculated date to proposed date.
                                                 value.proposedDate = newDate.toISOString();
-
+                                                //create diaryObject from two data from csv and from database api.
                                                 const diaryObject = { ...curatedDiaries[i], ...value };
+                                                //there is no need of day attribute so delete it.
                                                 delete diaryObject.day;
                                                 diariesForFarmer.push(diaryObject);
                                             }
+                                            //post all curated daily diaries to database api.
                                             await axios.post(process.env.API_URL + "/dailyDiary/all", {
                                                 data: diariesForFarmer
                                             }, {

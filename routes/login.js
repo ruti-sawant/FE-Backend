@@ -28,11 +28,24 @@ router.use(session({
 router.use(cookieParser());
 router.use(express.json());
 
+
+//to verify cookie from client.
 router.get("/", middleware, (req, res) => {
     console.log(req.get('host'));
     console.log(req.get('url'));
     if (req.cookies[process.env.COOKIE_NAME]) {
         const data = jwt.verify(req.cookies[process.env.COOKIE_NAME], process.env.JWT_ACCESS_TOKEN);
+        //create access token.
+        const accessToken = jwt.sign(data, process.env.JWT_ACCESS_TOKEN);
+        //pass cookie with response with token and data.
+        res.cookie(process.env.COOKIE_NAME, accessToken, {
+            path: "/",
+            httpOnly: true,
+            //time for 3 hours
+            maxAge: 1000 * 60 * 60 * 3,
+            secure: true,
+            sameSite: 'none'
+        });
         res.status(200).send({
             loggedIn: true, data
         });
@@ -42,6 +55,8 @@ router.get("/", middleware, (req, res) => {
     }
 });
 
+
+//to login user and check in database.
 router.post("/", middleware, (req, res) => {
     console.log(req.get('host'));
     console.log(req.get('url'));
@@ -61,12 +76,17 @@ router.post("/", middleware, (req, res) => {
         .then((data) => {
             console.log(data.data);
             if (data.data && data.data.loggedIn) {
+                //if user is authenticated then create cookie and send it to client.
+                //get data in cookieData.
                 const cookieData = data.data.data;
+                //create access token.
                 const accessToken = jwt.sign(cookieData, process.env.JWT_ACCESS_TOKEN);
+                //pass cookie with response with token and data.
                 res.cookie(process.env.COOKIE_NAME, accessToken, {
                     path: "/",
                     httpOnly: true,
-                    maxAge: 3600000,
+                    //time for 3 hours
+                    maxAge: 1000 * 60 * 60 * 3,
                     secure: true,
                     sameSite: 'none'
                 });

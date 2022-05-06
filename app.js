@@ -7,7 +7,7 @@ import axios from "axios";
 import cookieParser from "cookie-parser";
 const app = express();
 
-//to allow get from anywhere.
+//to allow cors from anywhere.
 const corsOptions = {
   'Access-Control-Allow-Origin': '*',
   origin: '*',
@@ -24,7 +24,6 @@ app.use(middleware);
 import uploadFile from "./routes/uploadFile.js";
 import farmers from "./routes/farmers.js";
 import dailyDiary from "./routes/dailyDiary.js";
-import bulkUpload from "./routes/bulkUpload.js";
 import seasonalData from "./routes/seasonalData.js";
 import broadcasts from "./routes/broadcast.js";
 import mrlReports from "./routes/mrl.js";
@@ -38,7 +37,6 @@ import middleware from "./middleware.js";
 app.use("/uploadFile", uploadFile);
 app.use("/farmers", farmers);
 app.use("/dailyDiary", dailyDiary);
-app.use("/bulkUpload", bulkUpload);
 app.use("/seasonalData", seasonalData);
 app.use("/broadcasts", broadcasts);
 app.use("/mrlReports", mrlReports);
@@ -54,7 +52,6 @@ app.listen(port, () => {
 });
 
 
-app.options("*", middleware);
 //route to fetch filters from database.
 app.get("/filters", middleware, (req, res) => {
   axios
@@ -72,7 +69,7 @@ app.get("/filters", middleware, (req, res) => {
     });
 });
 
-
+//to logout user.
 app.get("/logout", middleware, (req, res) => {
   //code to delete cookie
   res.cookie(process.env.COOKIE_NAME, '', {

@@ -10,7 +10,9 @@ import { Parser } from "json2csv";
 
 const router = express.Router();
 
-// /farmers/plots
+// route to map farmers and their plots.
+// for family head assign all plots of all other members in family.
+// for other members assign only their plots.
 router.get("/plots", middleware, (req, res) => {
     fetch(process.env.API_URL + "/farmers?personalInformation=1&plots.farmInformation=1&plots._id=1", {
         method: 'GET',
@@ -20,28 +22,27 @@ router.get("/plots", middleware, (req, res) => {
         }
     })
         .then((result) => {
-            // console.log("status", result.status);
             if (result.status == 200)
                 return result.json();
             else
                 return [];
         })
         .then((result) => {
-            // console.log("res", result);
             let resultLength = result.length;
             let objectToSend = [];
             for (let i = 0; i < resultLength; i++) {
                 const farmerObject = {};
+                //assigning common attributes.
                 farmerObject.farmerID = result[i]._id;
                 farmerObject.farmerName = result[i].personalInformation.name;
                 farmerObject.familyName = result[i].personalInformation.familyName;
                 farmerObject.GGN = result[i].personalInformation.GGN;
+                //for family head assign all plots of all other members in family.
                 if (result[i].personalInformation.name.trim() === result[i].personalInformation.familyName.trim()) {
                     farmerObject.plot = getPlotsForHead(result, i);
-                } else {
+                } else { //for other members assign only their plots.
                     farmerObject.plot = getPlots(result, i);
                 }
-                // console.log(farmerObject.farmerName, farmerObject.plot);
                 objectToSend.push(farmerObject);
             }
             // console.log(objectToSend);
@@ -53,6 +54,7 @@ router.get("/plots", middleware, (req, res) => {
         });
 });
 
+// method to get all farmers.
 router.get("/", middleware, (req, res) => {
     axios.get(process.env.API_URL + "/farmers", {
         headers: {
@@ -69,21 +71,27 @@ router.get("/", middleware, (req, res) => {
                 }
             })
                 .then((seasonalData) => {
+                    //data received from api.
                     const farmerDataReceived = data.data;
                     const seasonalDataReceived = seasonalData.data;
+
+                    //mapping of farmer MHCode and its location in seasonal data list.
                     const farmerMapping = new Map();
                     for (let i = 0; i < farmerDataReceived.length; i++) {
                         for (let j = 0; j < farmerDataReceived[i].plots.length; j++) {
                             farmerMapping.set(farmerDataReceived[i].plots[j].farmInformation.MHCode, { i, j });
                         }
                     }
+                    //mapping of farmer MHCode and its pruning date.
                     const seasonalDataMapping = new Map();
                     for (let i = 0; i < seasonalDataReceived.length; i++) {
+                        // for date lower than selected date ignore it.
                         if (seasonalDataMapping.has(seasonalDataReceived[i].MHCode) && new Date(seasonalDataMapping.get(seasonalDataReceived[i].MHCode)) > new Date(seasonalDataReceived[i].cropMilestoneDates.fruitPruning)) {
                             continue;
                         }
                         seasonalDataMapping.set(seasonalDataReceived[i].MHCode, seasonalDataReceived[i].cropMilestoneDates.fruitPruning);
                     }
+                    // assigning pruning date to farmer according to MHCode and location of MHCode in seasonalData list.
                     for (let key of seasonalDataMapping.keys()) {
                         // console.log(key, seasonalDataMapping.get(key));
                         if (farmerMapping.get(key))
@@ -103,7 +111,7 @@ router.get("/", middleware, (req, res) => {
         });
 });
 
-// /farmers/data/{farmerId}
+// to fetch data for a specific farmer.
 router.get("/data/:farmerId", middleware, (req, res) => {
     const farmerId = req.params.farmerId;
     axios.get(process.env.API_URL + "/farmers/" + farmerId, {
@@ -120,7 +128,7 @@ router.get("/data/:farmerId", middleware, (req, res) => {
         });
 });
 
-
+// to fetch farmers according to MHCode.
 router.get("/MHCode/:MHCode", middleware, (req, res) => {
     const MHCode = req.params.MHCode;
     axios.get(process.env.API_URL + "/farmers/MHCode/" + MHCode, {
@@ -137,10 +145,12 @@ router.get("/MHCode/:MHCode", middleware, (req, res) => {
         });
 })
 
+//to add new farmer.
 router.post("/", middleware, async (req, res) => {
     const data = req.body;
     console.log("post farmer body", data);
     try {
+        //if no familyName is selected then we have to add it to existing GGN
         if (data.personalInformation.familyName.trim() === "") {
             await axios.get(process.env.API_URL + "/farmers/GGN/" + data.personalInformation.GGN, {
                 headers: {
@@ -151,6 +161,7 @@ router.post("/", middleware, async (req, res) => {
                 .then((resData) => {
                     if (resData.data && resData.data[0]) {
                         console.log("data from api for GGN", resData.data);
+                        //set familyName from existing farmer and add it to new farmer.
                         data.personalInformation.familyName = resData.data[0].personalInformation.familyName;
                     } else {
                         res.status(400).send({ message: err.message });
@@ -162,6 +173,7 @@ router.post("/", middleware, async (req, res) => {
                     return;
                 })
         }
+        //api request to add new farmer in database api.
         axios.post(process.env.API_URL + "/farmers", {
             data
         }, {
@@ -182,6 +194,7 @@ router.post("/", middleware, async (req, res) => {
     }
 });
 
+//to add plot in existing farmer.
 router.post("/plots/addPlot/:farmerId", middleware, (req, res) => {
     const farmerId = req.params.farmerId;
     const data = req.body;
@@ -204,6 +217,8 @@ router.post("/plots/addPlot/:farmerId", middleware, (req, res) => {
         });
 });
 
+
+//to edit farmer data.
 router.post("/edit/:farmerId", middleware, (req, res) => {
     const farmerId = req.params.farmerId;
     const data = req.body;
@@ -226,6 +241,7 @@ router.post("/edit/:farmerId", middleware, (req, res) => {
         });
 });
 
+//to edit plot data of farmer.
 router.post("/plots/edit/:plotId", middleware, (req, res) => {
     const plotId = req.params.plotId;
     const data = req.body;
@@ -248,7 +264,7 @@ router.post("/plots/edit/:plotId", middleware, (req, res) => {
         });
 });
 
-
+//to delete farmer by its id.
 router.post("/delete/:farmerId", middleware, (req, res) => {
     const farmerId = req.params.farmerId;
     axios.delete(process.env.API_URL + "/farmers/" + farmerId, {
@@ -267,6 +283,7 @@ router.post("/delete/:farmerId", middleware, (req, res) => {
         });
 });
 
+//to delete plot of farmer by its id.
 router.post("/delete/plot/:plotId", middleware, (req, res) => {
     const plotId = req.params.plotId;
     axios.patch(process.env.API_URL + "/farmers/deletePlot/" + plotId, {
@@ -287,6 +304,7 @@ router.post("/delete/plot/:plotId", middleware, (req, res) => {
 });
 
 router.get("/exportFarmers", middleware, (req, res) => {
+    //to get farmers data from api.
     axios.get(process.env.API_URL + "/farmers", {
         method: 'GET',
         headers: {
@@ -304,9 +322,10 @@ router.get("/exportFarmers", middleware, (req, res) => {
             })
                 .then(async (data) => {
 
-                    //for extraction of seasonalData
+                    //data from database api.
                     const seasonalData = data.data;
                     const seasonalDataLength = seasonalData.length;
+                    //map to store mhcode and and indices of seasonal data from seasonal data
                     const mhcodeSeasonaldata = new Map();
                     for (let i = 0; i < seasonalDataLength; i++) {
                         if (!mhcodeSeasonaldata.has(seasonalData[i].MHCode)) {
@@ -324,9 +343,10 @@ router.get("/exportFarmers", middleware, (req, res) => {
                         farmerObject.farmerId = result[i]._id;
                         farmerObject.personalInformation = result[i].personalInformation;
                         const plots = getPlotsForExport(result, i);
+                        //iterate over plots.
                         for (let i = 0; i < plots.length; i++) {
                             farmerObject.plot = plots[i];
-                            // console.log(plots[i]);
+                            //to make all combinations of farmer seasonal data and plot seasonal data.
                             const seasonalDataIndices = mhcodeSeasonaldata.get(plots[i].farmInformation.MHCode);
                             if (seasonalDataIndices && seasonalDataIndices.length > 0) {
                                 for (let j = 0; j < seasonalDataIndices.length; j++) {
@@ -346,9 +366,10 @@ router.get("/exportFarmers", middleware, (req, res) => {
                     //export % should be calculated dynamically
                     const fields = ["srNo", "farmerId", "farmerName", "profileUrl", "mobile", "email", "familyName", "GGN", "farmMap", "plotNumber", "MHCode", "crop", "variety", "soilType", "plotArea", "latitude", "longitude", "googleMap", "village", "taluka", "district", "pincode", "tags", "nameOfConsultant", "notes", "spacingBetweenRows", "spacingBetweenCrops",
                         "year", "plantationDate", "foundationPruningDate", "fruitPruningDate", "readyToHarvestDate", "actualHarvestDate", "exportTonnage", "localTonnage", "exportPercent", "soilReport", "petioleReport", "waterReport", "preharvestQCLinks", "primaryIssuesFacedAtHarvest", "inwardQClinks", "knittingQCLinks", "packingQCLinks", "FGQCLinks", "onArrivalQCLinks", "primaryQualityIssueFaced", "MRLMaxIndividual", "MRLSum", "MRLNumberOfDetections", "MRLRedlistChemicals", "MRLReportLink", "quality"];
-                    // console.log(fields.length);
+
                     const csvData = [];
                     for (let i = 0; i < objectToSend.length; i++) {
+                        //code to check for null values. and extract data accordingly.
                         const tempObject = {};
                         tempObject.srNo = i + 1;
                         if (objectToSend[i].farmerId) {
@@ -486,6 +507,7 @@ router.get("/exportFarmers", middleware, (req, res) => {
                         } else {
                             tempObject.year = "";
                         }
+                        //code to format data properly.
                         if (objectToSend[i].seasonalData && objectToSend[i].seasonalData.cropMilestoneDates && objectToSend[i].seasonalData.cropMilestoneDates.plantation && objectToSend[i].seasonalData.cropMilestoneDates.plantation.length > 0) {
                             tempObject.plantationDate = objectToSend[i].seasonalData.cropMilestoneDates.plantation.substr(8, 2) + "/" + objectToSend[i].seasonalData.cropMilestoneDates.plantation.substr(5, 2) + "/" + objectToSend[i].seasonalData.cropMilestoneDates.plantation.substr(0, 4);
                         } else {
@@ -613,11 +635,11 @@ router.get("/exportFarmers", middleware, (req, res) => {
                         }
                         csvData.push(tempObject);
                     }
+                    //building csv data and parsing it in scv format.
                     const parser = new Parser({ fields });
                     const csv = parser.parse(csvData);
-                    // console.log(csv);
+                    // creating a file name and a file path.
                     res.setHeader("Content-Type", "text/csv");
-                    // res.setHeader("Content-Disposition", "attachment; filename=" + eventName + ".csv");
                     res.attachment("farmersDataExport.csv")
                     res.status(200).end(csv);
                 })
@@ -634,7 +656,7 @@ router.get("/exportFarmers", middleware, (req, res) => {
 })
 
 
-
+//to get list of all plots of farmer.
 function getPlotsForExport(result, i) {
     const plotsArray = result[i].plots;
     const numberOfPlots = plotsArray.length;
@@ -651,6 +673,7 @@ export default router;
 
 
 //supportive functions
+//to get list of all farmers if farmer is family head.
 function getPlotsForHead(result, i) {
     const gcnKey = result[i].personalInformation.GGN;
     const resultLength = result.length;
@@ -665,6 +688,7 @@ function getPlotsForHead(result, i) {
     return resultantArray;
 }
 
+//to get plot information of any one farmer plots.
 function getPlots(result, i) {
     const plotsArray = result[i].plots;
     const numberOfPlots = plotsArray.length;
