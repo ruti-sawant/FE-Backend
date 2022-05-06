@@ -6,6 +6,8 @@ import csv from "csv-parser";
 import { Readable } from "stream";
 import { Parser } from "json2csv";
 
+import middleware from '../middleware.js';
+
 const router = express.Router();
 
 router.post("/", middleware, (req, res) => {
