@@ -13,7 +13,7 @@ import middleware from '../middleware.js';
 
 const corsOptions = {
     'Access-Control-Allow-Origin': '*',
-    origin: ['*'],
+    origin: '*',
     credentials: true,            //access-control-allow-credentials:true
     optionSuccessStatus: 200
 }
