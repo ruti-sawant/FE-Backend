@@ -12,7 +12,6 @@ const corsOptions = {
   'Access-Control-Allow-Origin': '*',
   origin: ['*'],
   credentials: true,            //access-control-allow-credentials:true
-  optionSuccessStatus: 200
 }
 app.use(cors(corsOptions));
 app.use(fileUpload());
@@ -55,7 +54,7 @@ app.listen(port, () => {
 });
 
 
-app.options("/", cors());
+app.options("*", middleware);
 //route to fetch filters from database.
 app.get("/filters", middleware, (req, res) => {
   axios
