@@ -4,17 +4,20 @@ dotenv.config();
 import fileUpload from "express-fileupload";
 import cors from "cors";
 import axios from "axios";
+import cookieParser from "cookie-parser";
 const app = express();
 
 //to allow get from anywhere.
 const corsOptions = {
-  origin: "*",
-  credentials: true, //access-control-allow-credentials:true
-  optionSuccessStatus: 200,
-};
+  'Access-Control-Allow-Origin': '*',
+  origin: ['*'],
+  credentials: true,            //access-control-allow-credentials:true
+  optionSuccessStatus: 200
+}
 app.use(cors(corsOptions));
 app.use(fileUpload());
 app.use(express.json());
+app.use(cookieParser());
 
 //imports for routes.
 import uploadFile from "./routes/uploadFile.js";
@@ -27,6 +30,9 @@ import mrlReports from "./routes/mrl.js";
 import cropMonitoring from "./routes/cropMonitoring.js";
 import admins from "./routes/admins.js";
 import dailyDiaryAutomation from './routes/dailyDiaryAutomation.js';
+import login from './routes/login.js';
+
+import middleware from "./middleware.js";
 
 app.use("/uploadFile", uploadFile);
 app.use("/farmers", farmers);
@@ -38,6 +44,7 @@ app.use("/mrlReports", mrlReports);
 app.use("/cropMonitoring", cropMonitoring);
 app.use("/admins", admins);
 app.use("/dailyDiaryAutomation", dailyDiaryAutomation);
+app.use("/login", login);
 
 const port = process.env.PORT || 3000;
 
@@ -46,7 +53,7 @@ app.listen(port, () => {
 });
 
 //route to fetch filters from database.
-app.get("/filters", (req, res) => {
+app.get("/filters", middleware, (req, res) => {
   axios
     .get(process.env.API_URL + "/filters", {
       headers: {
@@ -60,4 +67,16 @@ app.get("/filters", (req, res) => {
     .catch((err) => {
       res.status(400).send({ message: err.message });
     });
+});
+
+
+app.get("/logout", middleware, (req, res) => {
+  //code to delete cookie
+  res.cookie(process.env.COOKIE_NAME, '', {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
+    expires: new Date(0)
+  });
+  res.status(200).send({ message: "Logged Out" });
 });

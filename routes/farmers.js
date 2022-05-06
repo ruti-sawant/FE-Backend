@@ -4,8 +4,7 @@ dotenv.config();
 import fetch from 'node-fetch';
 import axios from 'axios';
 
-import csv from "csv-parser";
-import { Readable } from "stream";
+
 import { Parser } from "json2csv";
 
 const router = express.Router();

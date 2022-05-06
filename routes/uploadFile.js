@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import express from 'express';
 import { google } from "googleapis";
+import middleware from "../middleware.js";
 const router = express.Router();
 
 
@@ -25,7 +26,7 @@ const drive = google.drive({
 
 
 //according to old method of usage according to old code and files are getting saved in "broadcast Daily Diary images" folder.
-router.post("/", async (req, res) => {
+router.post("/", middleware, async (req, res) => {
     if (req.files) {
         // console.log(req.files);
 
