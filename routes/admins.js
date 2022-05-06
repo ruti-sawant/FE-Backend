@@ -4,6 +4,15 @@ dotenv.config();
 import axios from 'axios';
 import middleware from '../middleware.js';
 const router = express.Router();
+import cors from "cors";
+const corsOptions = {
+    'Access-Control-Allow-Origin': '*',
+    origin: ['*'],
+    credentials: true,            //access-control-allow-credentials:true
+}
+express().use(cors(corsOptions));
+
+
 
 router.get("/", middleware, (req, res) => {
     axios.get(process.env.API_URL + "/admins", {
