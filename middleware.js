@@ -9,7 +9,7 @@ function middleware(req, res, next) {
         res.header('Access-Control-Allow-Headers', process.env.ALLOW_HEADERS);
         // res.header('Access-Control-Allow-Headers', '*');
         res.header('Access-Control-Allow-Credentials', true);
-        res.header("Access-Control-Allow-Methods", process.env.ALLOW_METHODS);
+        res.header("Access-Control-Allow-Methods", process.env.METHODS);
     }
     // res.header('Access-Control-Allow-Credentials', true);
     // res.header("Access-Control-Allow-Headers", "content-type");
