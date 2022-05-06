@@ -4,9 +4,11 @@ dotenv.config();
 import fetch from 'node-fetch';
 const router = express.Router();
 
+import middleware from '../middleware.js';
+
 import axios from 'axios';
 
-router.get("/", (req, res) => {
+router.get("/", middleware, (req, res) => {
     axios.get(process.env.API_URL + "/dailyDiary", {
         headers: {
             'Content-Type': 'application/json',
@@ -21,7 +23,7 @@ router.get("/", (req, res) => {
         });
 });
 
-router.get("/MHCode/:MHCode", (req, res) => {
+router.get("/MHCode/:MHCode", middleware, (req, res) => {
     const MHCode = req.params.MHCode;
     axios.get(process.env.API_URL + "/dailyDiary/MHCode/" + MHCode, {
         headers: {
@@ -37,7 +39,7 @@ router.get("/MHCode/:MHCode", (req, res) => {
         });
 });
 
-router.get("/farmers/:farmerId", (req, res) => {
+router.get("/farmers/:farmerId", middleware, (req, res) => {
     const farmerID = req.params.farmerId;
     axios.get(process.env.API_URL + "/dailyDiary/" + farmerID, {
         headers: {
@@ -53,7 +55,7 @@ router.get("/farmers/:farmerId", (req, res) => {
         });
 });
 
-router.get("/diary/:diaryId", (req, res) => {
+router.get("/diary/:diaryId", middleware, (req, res) => {
     const diaryId = req.params.diaryId;
     axios.get(process.env.API_URL + "/dailyDiary/data/" + diaryId, {
         headers: {

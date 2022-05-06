@@ -5,6 +5,8 @@ import { google } from "googleapis";
 import middleware from "../middleware.js";
 const router = express.Router();
 
+import middleware from '../middleware.js';
+
 
 const clientID = process.env.CLIENT_ID;
 const clientSecret = process.env.CLIENT_SECRETE;
@@ -43,7 +45,7 @@ router.post("/", middleware, async (req, res) => {
 });
 
 
-router.post("/:folderName", async (req, res) => {
+router.post("/:folderName", middleware, async (req, res) => {
     if (req.files) {
         // console.log(req.params.folderName);
         // console.log(req.files);
@@ -61,7 +63,7 @@ router.post("/:folderName", async (req, res) => {
     }
 });
 
-router.delete("/", async (req, res) => {
+router.delete("/", middleware, async (req, res) => {
     console.log(req.body);
     console.log(req.body.id);
     await deleteFile(req.body.id);

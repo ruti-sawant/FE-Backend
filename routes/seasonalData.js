@@ -2,7 +2,9 @@ import express from 'express';
 import axios from 'axios';
 const router = express.Router();
 
-router.get("/", (req, res) => {
+import middleware from '../middleware.js';
+
+router.get("/", middleware, (req, res) => {
     axios.get(process.env.API_URL + "/seasonalData", {
         headers: {
             'Content-Type': 'application/json',
@@ -17,7 +19,7 @@ router.get("/", (req, res) => {
         });
 });
 
-router.get("/plots/:plotId", (req, res) => {
+router.get("/plots/:plotId", middleware, (req, res) => {
     const plotId = req.params.plotId;
     axios.get(process.env.API_URL + "/seasonalData/farmers/plots/" + plotId, {
         headers: {
@@ -33,7 +35,7 @@ router.get("/plots/:plotId", (req, res) => {
         });
 });
 
-router.post("/", (req, res) => {
+router.post("/", middleware, (req, res) => {
     const data = req.body;
     console.log("post body", req.body);
     axios.post(process.env.API_URL + "/seasonalData", {
@@ -54,7 +56,7 @@ router.post("/", (req, res) => {
         });
 });
 
-router.post("/edit/:seasonalDataId", (req, res) => {
+router.post("/edit/:seasonalDataId", middleware, (req, res) => {
     const seasonalDataId = req.params.seasonalDataId;
     const data = req.body;
     console.log("patch body", req.body);
@@ -75,7 +77,7 @@ router.post("/edit/:seasonalDataId", (req, res) => {
         });
 });
 
-router.post("/delete/deleteByYear/:year", (req, res) => {
+router.post("/delete/deleteByYear/:year", middleware, (req, res) => {
     const year = req.params.year;
     axios.delete(process.env.API_URL + "/seasonalData/deleteByYear/data/" + year, {
         headers: {
@@ -93,7 +95,7 @@ router.post("/delete/deleteByYear/:year", (req, res) => {
         });
 });
 
-router.post("/delete/deleteByPlot/:plotId", (req, res) => {
+router.post("/delete/deleteByPlot/:plotId", middleware, (req, res) => {
     const plotId = req.params.plotId;
     axios.delete(process.env.API_URL + "/seasonalData/deleteByPlot/data/" + plotId, {
         headers: {
@@ -112,7 +114,7 @@ router.post("/delete/deleteByPlot/:plotId", (req, res) => {
 });
 
 
-router.post("/delete/deleteByFarmer/:farmerId", (req, res) => {
+router.post("/delete/deleteByFarmer/:farmerId", middleware, (req, res) => {
     const farmerId = req.params.farmerId;
     axios.delete(process.env.API_URL + "/seasonalData/" + farmerId, {
         headers: {
@@ -130,7 +132,7 @@ router.post("/delete/deleteByFarmer/:farmerId", (req, res) => {
         });
 });
 
-router.post("/delete/deleteBySeasonalId/:seasonalId", (req, res) => {
+router.post("/delete/deleteBySeasonalId/:seasonalId", middleware, (req, res) => {
     const seasonalId = req.params.seasonalId;
     axios.delete(process.env.API_URL + "/seasonalData/data/" + seasonalId, {
         headers: {

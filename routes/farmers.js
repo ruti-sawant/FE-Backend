@@ -4,13 +4,14 @@ dotenv.config();
 import fetch from 'node-fetch';
 import axios from 'axios';
 
+import middleware from '../middleware.js';
 
 import { Parser } from "json2csv";
 
 const router = express.Router();
 
 // /farmers/plots
-router.get("/plots", (req, res) => {
+router.get("/plots", middleware, (req, res) => {
     fetch(process.env.API_URL + "/farmers?personalInformation=1&plots.farmInformation=1&plots._id=1", {
         method: 'GET',
         headers: {
@@ -52,7 +53,7 @@ router.get("/plots", (req, res) => {
         });
 });
 
-router.get("/", (req, res) => {
+router.get("/", middleware, (req, res) => {
     axios.get(process.env.API_URL + "/farmers", {
         headers: {
             'Content-Type': 'application/json',
@@ -103,7 +104,7 @@ router.get("/", (req, res) => {
 });
 
 // /farmers/data/{farmerId}
-router.get("/data/:farmerId", (req, res) => {
+router.get("/data/:farmerId", middleware, (req, res) => {
     const farmerId = req.params.farmerId;
     axios.get(process.env.API_URL + "/farmers/" + farmerId, {
         headers: {
@@ -120,7 +121,7 @@ router.get("/data/:farmerId", (req, res) => {
 });
 
 
-router.get("/MHCode/:MHCode", (req, res) => {
+router.get("/MHCode/:MHCode", middleware, (req, res) => {
     const MHCode = req.params.MHCode;
     axios.get(process.env.API_URL + "/farmers/MHCode/" + MHCode, {
         headers: {
@@ -181,7 +182,7 @@ router.post("/", async (req, res) => {
     }
 });
 
-router.post("/plots/addPlot/:farmerId", (req, res) => {
+router.post("/plots/addPlot/:farmerId", middleware, (req, res) => {
     const farmerId = req.params.farmerId;
     const data = req.body;
     axios.patch(process.env.API_URL + "/farmers/newPlot/" + farmerId, {
@@ -203,7 +204,7 @@ router.post("/plots/addPlot/:farmerId", (req, res) => {
         });
 });
 
-router.post("/edit/:farmerId", (req, res) => {
+router.post("/edit/:farmerId", middleware, (req, res) => {
     const farmerId = req.params.farmerId;
     const data = req.body;
     console.log("patch body", req.body);
@@ -225,7 +226,7 @@ router.post("/edit/:farmerId", (req, res) => {
         });
 });
 
-router.post("/plots/edit/:plotId", (req, res) => {
+router.post("/plots/edit/:plotId", middleware, (req, res) => {
     const plotId = req.params.plotId;
     const data = req.body;
     console.log("plots patch body", data);
@@ -248,7 +249,7 @@ router.post("/plots/edit/:plotId", (req, res) => {
 });
 
 
-router.post("/delete/:farmerId", (req, res) => {
+router.post("/delete/:farmerId", middleware, (req, res) => {
     const farmerId = req.params.farmerId;
     axios.delete(process.env.API_URL + "/farmers/" + farmerId, {
         headers: {
@@ -266,7 +267,7 @@ router.post("/delete/:farmerId", (req, res) => {
         });
 });
 
-router.post("/delete/plot/:plotId", (req, res) => {
+router.post("/delete/plot/:plotId", middleware, (req, res) => {
     const plotId = req.params.plotId;
     axios.patch(process.env.API_URL + "/farmers/deletePlot/" + plotId, {
     }, {
@@ -285,7 +286,7 @@ router.post("/delete/plot/:plotId", (req, res) => {
         });
 });
 
-router.get("/exportFarmers", (req, res) => {
+router.get("/exportFarmers", middleware, (req, res) => {
     axios.get(process.env.API_URL + "/farmers", {
         method: 'GET',
         headers: {

@@ -2,9 +2,10 @@ import express from 'express';
 import dotenv from 'dotenv';
 dotenv.config();
 import axios from 'axios';
+import middleware from '../middleware.js';
 const router = express.Router();
 
-router.get("/", (req, res) => {
+router.get("/", middleware, (req, res) => {
     axios.get(process.env.API_URL + "/admins", {
         headers: {
             'Content-Type': 'application/json',
@@ -21,7 +22,7 @@ router.get("/", (req, res) => {
         });
 });
 
-router.get("/:adminId", (req, res) => {
+router.get("/:adminId", middleware, (req, res) => {
     const adminId = req.params.adminId;
     axios.get(process.env.API_URL + "/admins/" + adminId, {
         headers: {
@@ -39,7 +40,7 @@ router.get("/:adminId", (req, res) => {
         });
 });
 
-router.post("/", (req, res) => {
+router.post("/", middleware, (req, res) => {
     const data = req.body;
     axios.post(process.env.API_URL + "/admins", {
         data
@@ -60,7 +61,7 @@ router.post("/", (req, res) => {
         });
 });
 
-router.patch("/:adminId", (req, res) => {
+router.patch("/:adminId", middleware, (req, res) => {
     const adminId = req.params.adminId;
     const data = req.body;
     axios.patch(process.env.API_URL + "/admins/" + adminId, {
@@ -81,7 +82,7 @@ router.patch("/:adminId", (req, res) => {
         });
 });
 
-router.delete("/:adminId", (req, res) => {
+router.delete("/:adminId", middleware, (req, res) => {
     const adminId = req.params.adminId;
     axios.delete(process.env.API_URL + "/admins/" + adminId, {
         headers: {

@@ -4,7 +4,9 @@ dotenv.config();
 import axios from 'axios';
 const router = express.Router();
 
-router.get("/", (req, res) => {
+import middleware from '../middleware.js';
+
+router.get("/", middleware, (req, res) => {
     axios.get(process.env.API_URL + "/broadcasts", {
         headers: {
             'Content-Type': 'application/json',
@@ -21,7 +23,7 @@ router.get("/", (req, res) => {
         });
 });
 
-router.get("/:broadcastId", (req, res) => {
+router.get("/:broadcastId", middleware, (req, res) => {
     const broadcastId = req.params.broadcastId;
     axios.get(process.env.API_URL + "/broadcasts/" + broadcastId, {
         headers: {
@@ -39,7 +41,7 @@ router.get("/:broadcastId", (req, res) => {
         });
 });
 
-router.get("/farmer/:farmerId", (req, res) => {
+router.get("/farmer/:farmerId", middleware, (req, res) => {
     const farmerId = req.params.farmerId;
     axios.get(process.env.API_URL + "/broadcasts/farmer/" + farmerId, {
         headers: {
@@ -57,7 +59,7 @@ router.get("/farmer/:farmerId", (req, res) => {
         });
 });
 
-router.post("/", (req, res) => {
+router.post("/", middleware, (req, res) => {
     const data = req.body;
     axios.post(process.env.API_URL + "/broadcasts", {
         data
@@ -77,7 +79,7 @@ router.post("/", (req, res) => {
         });
 });
 
-router.post("/insertQuestion/:broadcastId", (req, res) => {
+router.post("/insertQuestion/:broadcastId", middleware, (req, res) => {
     const data = req.body;
     const broadcastId = req.params.broadcastId;
     axios.patch(process.env.API_URL + "/broadcasts/" + broadcastId, {
@@ -98,7 +100,7 @@ router.post("/insertQuestion/:broadcastId", (req, res) => {
         });
 });
 
-router.post("/insertAnswer/:broadcastId/:chatId", (req, res) => {
+router.post("/insertAnswer/:broadcastId/:chatId", middleware, (req, res) => {
     const data = req.body;
     const broadcastId = req.params.broadcastId;
     const chatId = req.params.chatId;
@@ -120,7 +122,7 @@ router.post("/insertAnswer/:broadcastId/:chatId", (req, res) => {
         });
 });
 
-router.post("/delete/:broadcastId", (req, res) => {
+router.post("/delete/:broadcastId", middleware, (req, res) => {
     const broadcastId = req.params.broadcastId;
     axios.delete(process.env.API_URL + "/broadcasts/" + broadcastId, {
         headers: {

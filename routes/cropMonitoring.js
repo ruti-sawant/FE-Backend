@@ -4,15 +4,11 @@ dotenv.config();
 import axios from "axios";
 const router = express.Router();
 
+import middleware from '../middleware.js';
+
 export default router;
 
-// router.get("/", (req, res) => {
-//   console.log(req.ip);
-//   res.send("Hi");
-// });
-
-// /cropMonitoring
-router.get("/", (req, res) => {
+router.get("/", middleware, (req, res) => {
   axios
     .get(process.env.API_URL + "/cropMonitoring", {
       headers: {
@@ -31,7 +27,7 @@ router.get("/", (req, res) => {
 });
 
 // /cropMonitoring/data/<monitoringId>
-router.get("/data/:monitoringId", (req, res) => {
+router.get("/data/:monitoringId", middleware, (req, res) => {
   const monitoringId = req.params.monitoringId;
   axios
     .get(process.env.API_URL + "/cropMonitoring/data/" + monitoringId, {
@@ -51,7 +47,7 @@ router.get("/data/:monitoringId", (req, res) => {
 });
 
 // /cropMonitoring/MHCode/<MHCode>
-router.get("/MHCode/:MHCode", (req, res) => {
+router.get("/MHCode/:MHCode", middleware, (req, res) => {
   const MHCode = req.params.MHCode;
   axios
     .get(process.env.API_URL + "/cropMonitoring/MHCode/" + MHCode, {
@@ -71,7 +67,7 @@ router.get("/MHCode/:MHCode", (req, res) => {
 });
 
 // delete according MonitoringId
-router.post("/delete/:monitoringId", (req, res) => {
+router.post("/delete/:monitoringId", middleware, (req, res) => {
   const monitoringId = req.params.monitoringId;
   axios
     .delete(process.env.API_URL + "/cropMonitoring/" + monitoringId, {
@@ -91,7 +87,7 @@ router.post("/delete/:monitoringId", (req, res) => {
 });
 
 // delete according MHCode
-router.post("/delete/MHCode/:MHCode", (req, res) => {
+router.post("/delete/MHCode/:MHCode", middleware, (req, res) => {
   const MHCode = req.params.MHCode;
   axios
     .delete(process.env.API_URL + "/cropMonitoring/MHCode/" + MHCode, {

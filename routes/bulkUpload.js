@@ -2,16 +2,16 @@ import express from 'express';
 import csv from "csv-parser";
 import fetch from 'node-fetch';
 import { Readable } from "stream";
-import axios from 'axios';
+
+import middleware from '../middleware.js';
 
 const router = express.Router();
 
-router.post("/", (req, res) => {
+router.post("/", middleware, (req, res) => {
     const readable = Readable.from(req.files.fileToUpload.data);
     const farmerId = req.body.farmerId;
     const plotNumber = req.body.plotNumber;
 
-    //NOTE: after testing delete.
     const dataToSend = [];
     readable.pipe(csv())
         .on('data', (row) => {

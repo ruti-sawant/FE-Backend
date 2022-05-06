@@ -7,7 +7,9 @@ import { Readable } from "stream";
 const router = express.Router();
 
 
-router.get("", (req, res) => {
+import middleware from '../middleware.js';
+
+router.get("", middleware, (req, res) => {
     axios.get(process.env.API_URL + "/mrlReports", {
         headers: {
             'Content-Type': 'application/json',
@@ -24,7 +26,7 @@ router.get("", (req, res) => {
         });
 });
 
-router.get("/data/:mrlId", (req, res) => {
+router.get("/data/:mrlId", middleware, (req, res) => {
     const mrlId = req.params.mrlId;
     axios.get(process.env.API_URL + "/mrlReports/data/" + mrlId, {
         headers: {
@@ -42,7 +44,7 @@ router.get("/data/:mrlId", (req, res) => {
         });
 });
 
-router.get("/MHCode/:MHCode", (req, res) => {
+router.get("/MHCode/:MHCode", middleware, (req, res) => {
     const MHCode = req.params.MHCode;
     axios.get(process.env.API_URL + "/mrlReports/MHCode/" + MHCode, {
         headers: {
@@ -60,7 +62,7 @@ router.get("/MHCode/:MHCode", (req, res) => {
         });
 });
 
-router.get("/sampleNumber/:sampleNumber", (req, res) => {
+router.get("/sampleNumber/:sampleNumber", middleware, (req, res) => {
     const sampleNumber = req.params.sampleNumber;
     axios.get(process.env.API_URL + "/mrlReports/sampleNumber/" + sampleNumber, {
         headers: {
@@ -79,7 +81,7 @@ router.get("/sampleNumber/:sampleNumber", (req, res) => {
 });
 
 
-router.post("/", (req, res) => {
+router.post("/", middleware, (req, res) => {
     const data = req.body;
     axios.post(process.env.API_URL + "/mrlReports", {
         data
@@ -101,7 +103,7 @@ router.post("/", (req, res) => {
 
 
 //function added by Harshal
-router.post("/uploadCSV", (req, res) => {
+router.post("/uploadCSV", middleware, (req, res) => {
     if (req.files) {
         const readable = Readable.from(req.files.allMRLReports.data);
         const dataToSend = [];
@@ -224,7 +226,7 @@ router.post("/uploadCSV", (req, res) => {
 });
 
 
-router.post("/delete/:mrlId", (req, res) => {
+router.post("/delete/:mrlId", middleware, (req, res) => {
     const mrlId = req.params.mrlId;
     axios.delete(process.env.API_URL + "/mrlReports/" + mrlId, {
         headers: {
@@ -242,7 +244,7 @@ router.post("/delete/:mrlId", (req, res) => {
         });
 });
 
-router.post("/delete/MHCode/:MHCode/:year?", (req, res) => {
+router.post("/delete/MHCode/:MHCode/:year?", middleware, (req, res) => {
     const MHCode = req.params.MHCode;
     const year = req.params.year;
     let url = "";
@@ -268,7 +270,7 @@ router.post("/delete/MHCode/:MHCode/:year?", (req, res) => {
 });
 
 //handling approved chemicals.
-router.get("/approvedChemicals", (req, res) => {
+router.get("/approvedChemicals", middleware, (req, res) => {
     axios.get(process.env.API_URL + "/mrlReports/approvedChemicals", {
         headers: {
             'Content-Type': 'application/json',
@@ -285,7 +287,7 @@ router.get("/approvedChemicals", (req, res) => {
         });
 });
 
-router.post("/uploadApprovedChemicals", (req, res) => {
+router.post("/uploadApprovedChemicals", middleware, (req, res) => {
     if (req.files) {
         const readable = Readable.from(req.files.approvedChemicals.data);
         const dataToSend = [];
@@ -331,7 +333,7 @@ router.post("/uploadApprovedChemicals", (req, res) => {
 
 
 //handling banned chemicals.
-router.get("/bannedChemicals", (req, res) => {
+router.get("/bannedChemicals", middleware, (req, res) => {
     axios.get(process.env.API_URL + "/mrlReports/bannedChemicals", {
         headers: {
             'Content-Type': 'application/json',
@@ -348,7 +350,7 @@ router.get("/bannedChemicals", (req, res) => {
         });
 });
 
-router.post("/uploadBannedChemicals", (req, res) => {
+router.post("/uploadBannedChemicals", middleware, (req, res) => {
     if (req.files) {
         const readable = Readable.from(req.files.bannedChemicals.data);
         const dataToSend = [];

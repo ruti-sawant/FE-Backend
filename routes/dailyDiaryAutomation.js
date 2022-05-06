@@ -8,7 +8,7 @@ import { Parser } from "json2csv";
 
 const router = express.Router();
 
-router.post("/", (req, res) => {
+router.post("/", middleware, (req, res) => {
     let MHCodesArray = [];
     if (req.body.MHCodes && req.body.MHCodes.length > 0) {
         MHCodesArray = req.body.MHCodes.split(",");
