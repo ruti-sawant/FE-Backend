@@ -173,6 +173,10 @@ router.post("/uploadCSV", middleware, (req, res) => {
                             if (splittedDate.length != 3)
                                 splittedDate = tempData[i].dateOfSampling.split("-");
                             // console.log(splittedDate);
+                            if (splittedDate.length != 3 || splittedDate[0].length != 2 || splittedDate[1].length != 2 || splittedDate[2].length != 4) {
+                                res.status(400).send({ message: "Date is not in correct format." });
+                                return;
+                            }
                             const dateObj = new Date(new Date(splittedDate[1] + "-" + splittedDate[0] + "-" + splittedDate[2]) - new Date().getTimezoneOffset() * 60000);
                             // console.log(dateObj);
                             let newItem = {
