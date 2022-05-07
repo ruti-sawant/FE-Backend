@@ -49,7 +49,7 @@ router.get("/plots", middleware, (req, res) => {
             res.status(200).send(objectToSend);
         })
         .catch((err) => {
-            console.log("err", err);
+            //console.log("err", err);
             res.status(400).send({ message: err.message });
         });
 });
@@ -101,12 +101,12 @@ router.get("/", middleware, (req, res) => {
                     res.status(200).send(farmerDataReceived);
                 })
                 .catch((err) => {
-                    console.log("seasonalData", err);
+                    //console.log("seasonalData", err);
                     res.status(400).send({ message: err.message });
                 });
         })
         .catch((err) => {
-            console.log("farmer", err);
+            //console.log("farmer", err);
             res.status(400).send({ message: err.message });
         });
 });
@@ -148,7 +148,7 @@ router.get("/MHCode/:MHCode", middleware, (req, res) => {
 //to add new farmer.
 router.post("/", middleware, async (req, res) => {
     const data = req.body;
-    console.log("post farmer body", data);
+    //console.log("post farmer body", data);
     try {
         //if no familyName is selected then we have to add it to existing GGN
         if (data.personalInformation.familyName.trim() === "") {
@@ -160,7 +160,7 @@ router.post("/", middleware, async (req, res) => {
             })
                 .then((resData) => {
                     if (resData.data && resData.data[0]) {
-                        console.log("data from api for GGN", resData.data);
+                        //console.log("data from api for GGN", resData.data);
                         //set familyName from existing farmer and add it to new farmer.
                         data.personalInformation.familyName = resData.data[0].personalInformation.familyName;
                     } else {
@@ -186,7 +186,7 @@ router.post("/", middleware, async (req, res) => {
                 res.status(200).send({ message: "Farmer inserted successfully" });
             })
             .catch((err) => {
-                console.log(err);
+                //console.log(err);
                 res.status(400).send({ message: err.message });
             });
     } catch (err) {
@@ -207,11 +207,11 @@ router.post("/plots/addPlot/:farmerId", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log("data in post of farmer plot insert", data);
+            //console.log("data in post of farmer plot insert", data);
             res.status(200).send({ message: "Farmer plot inserted successfully" });
         })
         .catch((err) => {
-            console.log(err);
+            //console.log(err);
 
             res.status(400).send({ message: err.message });
         });
@@ -222,7 +222,7 @@ router.post("/plots/addPlot/:farmerId", middleware, (req, res) => {
 router.post("/edit/:farmerId", middleware, (req, res) => {
     const farmerId = req.params.farmerId;
     const data = req.body;
-    console.log("patch body", req.body);
+    //console.log("patch body", req.body);
     axios.patch(process.env.API_URL + "/farmers/" + farmerId, {
         data
     }, {
@@ -245,7 +245,7 @@ router.post("/edit/:farmerId", middleware, (req, res) => {
 router.post("/plots/edit/:plotId", middleware, (req, res) => {
     const plotId = req.params.plotId;
     const data = req.body;
-    console.log("plots patch body", data);
+    //console.log("plots patch body", data);
     axios.patch(process.env.API_URL + "/farmers/plots/" + plotId, {
         data
     }, {
@@ -255,11 +255,11 @@ router.post("/plots/edit/:plotId", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log("plots patch then", data);
+            //console.log("plots patch then", data);
             res.status(200).send({ message: "Farmer updated successfully" });
         })
         .catch((err) => {
-            console.log("plots patch err", err);
+            //console.log("plots patch err", err);
             res.status(400).send({ message: err.message });
         });
 });
@@ -274,11 +274,11 @@ router.post("/delete/:farmerId", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log("data", data);
+            //console.log("data", data);
             res.status(200).send({ message: "Farmer " + farmerId + " deleted successfully" });
         })
         .catch((err) => {
-            console.log("err", err);
+            //console.log("err", err);
             res.status(400).send({ message: err.message });
         });
 });
@@ -294,11 +294,11 @@ router.post("/delete/plot/:plotId", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log("data", data);
+            //console.log("data", data);
             res.status(200).send({ message: "Farmer plot " + plotId + " deleted successfully" });
         })
         .catch((err) => {
-            console.log("err", err);
+            //console.log("err", err);
             res.status(400).send({ message: err.response.data.message });
         });
 });
@@ -644,13 +644,13 @@ router.get("/exportFarmers", middleware, (req, res) => {
                     res.status(200).end(csv);
                 })
                 .catch((err) => {
-                    console.log(err);
+                    //console.log(err);
                     res.status(400).send({ message: err.message });
                 });
             // res.status(200).send(objectToSend);
         })
         .catch((err) => {
-            console.log("err", err);
+            //console.log("err", err);
             res.status(400).send({ message: err.message });
         });
 })
@@ -694,7 +694,7 @@ function getPlots(result, i) {
     const numberOfPlots = plotsArray.length;
     const resultantArray = [];
     for (let j = 0; j < numberOfPlots; j++) {
-        console.log(plotsArray[j]);
+        //console.log(plotsArray[j]);
         resultantArray.push({
             plotId: plotsArray[j]._id,
             plot: plotsArray[j].farmInformation.plotNumber,

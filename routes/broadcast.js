@@ -15,11 +15,11 @@ router.get("/", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log("data", data.data);
+            // console.log("data", data.data);
             res.status(200).send(data.data);
         })
         .catch((err) => {
-            console.log("err", err);
+            // console.log("err", err);
             res.status(400).send({ message: err.message });
         });
 });
@@ -35,11 +35,11 @@ router.get("/:broadcastId", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log("data", data.data);
+            // console.log("data", data.data);
             res.status(200).send(data.data);
         })
         .catch((err) => {
-            console.log("err", err);
+            // console.log("err", err);
             res.status(400).send({ message: err.message });
         });
 });
@@ -54,11 +54,11 @@ router.get("/farmer/:farmerId", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log("data", data.data);
+            // console.log("data", data.data);
             res.status(200).send(data.data);
         })
         .catch((err) => {
-            console.log("err", err);
+            // console.log("err", err);
             res.status(400).send({ message: err.message });
         });
 });
@@ -75,11 +75,11 @@ router.post("/", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log("broadcast inserted", data);
+            // console.log("broadcast inserted", data);
             res.status(200).send({ message: "Broadcast inserted successfully" });
         })
         .catch((err) => {
-            console.log("Broadcast insert err", err);
+            // console.log("Broadcast insert err", err);
             res.status(400).send({ message: err.message });
         });
 });
@@ -97,11 +97,11 @@ router.post("/insertQuestion/:broadcastId", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log("broadcast question inserted", data);
+            // console.log("broadcast question inserted", data);
             res.status(200).send({ message: "Broadcast question inserted successfully" });
         })
         .catch((err) => {
-            console.log("Broadcast question insert err", data);
+            // console.log("Broadcast question insert err", data);
             res.status(400).send({ message: err.message });
         });
 });
@@ -121,11 +121,11 @@ router.post("/insertAnswer/:broadcastId/:chatId", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log("broadcast answer inserted", data);
+            // console.log("broadcast answer inserted", data);
             res.status(200).send({ message: "Broadcast answer inserted successfully" });
         })
         .catch((err) => {
-            console.log("Broadcast answer insert err", data);
+            // console.log("Broadcast answer insert err", data);
             res.status(400).send({ message: err.message });
         });
 });
@@ -140,11 +140,11 @@ router.post("/delete/:broadcastId", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log("broadcast delete", data);
+            // console.log("broadcast delete", data);
             res.status(200).send({ message: "Broadcast deleted successfully" });
         })
         .catch((err) => {
-            console.log("Broadcast delete err", data);
+            // console.log("Broadcast delete err", data);
             res.status(400).send({ message: err.message });
         });
 })

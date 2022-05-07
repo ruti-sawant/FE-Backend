@@ -41,7 +41,7 @@ router.get("/plots/:plotId", middleware, (req, res) => {
 //to add new seasonal data.
 router.post("/", middleware, (req, res) => {
     const data = req.body;
-    console.log("post body", req.body);
+    //console.log("post body", req.body);
     axios.post(process.env.API_URL + "/seasonalData", {
         data
     }, {
@@ -51,11 +51,11 @@ router.post("/", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log("SeasonalData updated data", data);
+            //console.log("SeasonalData updated data", data);
             res.status(200).send({ message: "SeasonalData updated successfully" });
         })
         .catch((err) => {
-            console.log("SeasonalData updated err", data);
+            //console.log("SeasonalData updated err", data);
             res.status(400).send({ message: err.message });
         });
 });
@@ -64,7 +64,7 @@ router.post("/", middleware, (req, res) => {
 router.post("/edit/:seasonalDataId", middleware, (req, res) => {
     const seasonalDataId = req.params.seasonalDataId;
     const data = req.body;
-    console.log("patch body", req.body);
+    //console.log("patch body", req.body);
     axios.patch(process.env.API_URL + "/seasonalData/" + seasonalDataId, {
         data
     }, {
@@ -92,11 +92,11 @@ router.post("/delete/deleteByYear/:year", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log("data", data);
+            //console.log("data", data);
             res.status(200).send({ message: "year " + year + " records deleted successfully" });
         })
         .catch((err) => {
-            console.log("err", err);
+            //console.log("err", err);
             res.status(400).send({ message: err.message });
         });
 });
@@ -111,11 +111,11 @@ router.post("/delete/deleteByPlot/:plotId", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log("data", data);
+            //console.log("data", data);
             res.status(200).send({ message: "year " + plotId + " records deleted successfully" });
         })
         .catch((err) => {
-            console.log("err", err);
+            //console.log("err", err);
             res.status(400).send({ message: err.message });
         });
 });
@@ -131,11 +131,11 @@ router.post("/delete/deleteByFarmer/:farmerId", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log("data", data);
+            //console.log("data", data);
             res.status(200).send({ message: "farmer " + farmerId + " records deleted successfully" });
         })
         .catch((err) => {
-            console.log("err", err);
+            //console.log("err", err);
             res.status(400).send({ message: err.message });
         });
 });
@@ -150,11 +150,11 @@ router.post("/delete/deleteBySeasonalId/:seasonalId", middleware, (req, res) => 
         }
     })
         .then((data) => {
-            console.log("data", data);
+            //console.log("data", data);
             res.status(200).send({ message: "seasonal data " + seasonalId + " record deleted successfully" });
         })
         .catch((err) => {
-            console.log("err", err);
+            //console.log("err", err);
             res.status(400).send({ message: err.message });
         });
 });

@@ -17,11 +17,11 @@ router.get("/", middleware, (req, res) => {
       },
     })
     .then((data) => {
-      console.log("data", data.data);
+      // console.log("data", data.data);
       res.status(200).send(data.data);
     })
     .catch((err) => {
-      console.log("err", err);
+      // console.log("err", err);
       res.status(400).send({ message: err.message });
     });
 });
@@ -37,11 +37,11 @@ router.get("/data/:monitoringId", middleware, (req, res) => {
       },
     })
     .then((data) => {
-      console.log("data", data.data);
+      // console.log("data", data.data);
       res.status(200).send(data.data);
     })
     .catch((err) => {
-      console.log("err", err);
+      // console.log("err", err);
       res.status(400).send({ message: err.message });
     });
 });
@@ -57,11 +57,11 @@ router.get("/MHCode/:MHCode", middleware, (req, res) => {
       },
     })
     .then((data) => {
-      console.log("data", data.data);
+      // console.log("data", data.data);
       res.status(200).send(data.data);
     })
     .catch((err) => {
-      console.log("err", err);
+      // console.log("err", err);
       res.status(400).send({ message: err.message });
     });
 });
@@ -77,11 +77,11 @@ router.post("/delete/:monitoringId", middleware, (req, res) => {
       },
     })
     .then((data) => {
-      console.log("Crop Monitoring item deleted based on MonitoringId", data);
+      // console.log("Crop Monitoring item deleted based on MonitoringId", data);
       res.status(200).send({ message: "Data deleted successfully" });
     })
     .catch((err) => {
-      console.log("Deleting error", err);
+      // console.log("Deleting error", err);
       res.status(400).send({ message: err.message });
     });
 });
@@ -97,11 +97,11 @@ router.post("/delete/MHCode/:MHCode", middleware, (req, res) => {
       },
     })
     .then((data) => {
-      console.log("Crop Monitoring item deleted based on MHCode", data);
+      // console.log("Crop Monitoring item deleted based on MHCode", data);
       res.status(200).send({ message: "Data deleted successfully" });
     })
     .catch((err) => {
-      console.log("Deleting error", err);
+      // console.log("Deleting error", err);
       res.status(400).send({ message: err.message });
     });
 });

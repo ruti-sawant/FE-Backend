@@ -31,8 +31,8 @@ router.use(express.json());
 
 //to verify cookie from client.
 router.get("/", middleware, (req, res) => {
-    console.log(req.get('host'));
-    console.log(req.get('url'));
+    //console.log(req.get('host'));
+    //console.log(req.get('url'));
     if (req.cookies[process.env.COOKIE_NAME]) {
         const data = jwt.verify(req.cookies[process.env.COOKIE_NAME], process.env.JWT_ACCESS_TOKEN);
         //create access token.
@@ -50,7 +50,7 @@ router.get("/", middleware, (req, res) => {
             loggedIn: true, data
         });
     } else {
-        console.log("no cookie exists");
+        //console.log("no cookie exists");
         res.status(200).send({ loggedIn: false });
     }
 });
@@ -63,11 +63,11 @@ router.get("/usernames", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log(data.data);
+            //console.log(data.data);
             res.status(200).send(data.data);
         })
         .catch((err) => {
-            console.log(err);
+            //console.log(err);
             res.status(500).send({ message: err.message });
         })
 });
@@ -83,22 +83,22 @@ router.post("/forgotPassword", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log("broadcast inserted", data.data);
+            //console.log("broadcast inserted", data.data);
             res.status(200).send({ message: "password updated successfully" });
         })
         .catch((err) => {
-            console.log("Broadcast insert err", err);
+            //console.log("Broadcast insert err", err);
             res.status(400).send({ message: err.message });
         });
 });
 
 //to login user and check in database.
 router.post("/", middleware, (req, res) => {
-    console.log(req.get('host'));
-    console.log(req.get('url'));
+    //console.log(req.get('host'));
+    //console.log(req.get('url'));
     const userId = req.body.userId;
     const password = req.body.password;
-    console.log(userId, password);
+    //console.log(userId, password);
     axios.post(process.env.API_URL + "/login/verify", {
         data: {
             userId, password
@@ -110,7 +110,7 @@ router.post("/", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log(data.data);
+            //console.log(data.data);
             if (data.data && data.data.loggedIn) {
                 //if user is authenticated then create cookie and send it to client.
                 //get data in cookieData.
@@ -132,7 +132,7 @@ router.post("/", middleware, (req, res) => {
             }
         })
         .catch((err) => {
-            console.log(err);
+            //console.log(err);
             res.status(400).send({ message: err.message });
         });
 });

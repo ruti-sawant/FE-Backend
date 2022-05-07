@@ -15,11 +15,11 @@ router.get("/", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log("data", data.data);
+            // console.log("data", data.data);
             res.status(200).send(data.data);
         })
         .catch((err) => {
-            console.log("err", err);
+            // console.log("err", err);
             res.status(400).send({ message: err.message });
         });
 });
@@ -34,11 +34,11 @@ router.get("/:adminId", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log("data", data.data);
+            // console.log("data", data.data);
             res.status(200).send(data.data);
         })
         .catch((err) => {
-            console.log("err", err);
+            // console.log("err", err);
             res.status(400).send({ message: err.message });
         });
 });
@@ -57,11 +57,11 @@ router.post("/", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log("data", data.data);
+            // console.log("data", data.data);
             res.status(200).send(data.data);
         })
         .catch((err) => {
-            console.log("err", err);
+            // console.log("err", err);
             res.status(400).send({ message: err.message });
         });
 });
@@ -80,11 +80,11 @@ router.patch("/:adminId", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log("data", data.data);
+            // console.log("data", data.data);
             res.status(200).send(data.data);
         })
         .catch((err) => {
-            console.log("err", err);
+            // console.log("err", err);
             res.status(400).send({ message: err.message });
         });
 });
@@ -100,11 +100,11 @@ router.delete("/:adminId", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log("data", data.data);
+            // console.log("data", data.data);
             res.status(200).send(data.data);
         })
         .catch((err) => {
-            console.log("err", err);
+            // console.log("err", err);
             res.status(400).send({ message: err.message });
         });
 });

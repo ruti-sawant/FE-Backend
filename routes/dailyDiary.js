@@ -104,7 +104,7 @@ router.post("/", async (req, res) => {
                 objectToPush.MHCode = "";
                 const plots = result.plots;
                 for (let i = 0; i < plots.length; i++) {
-                    console.log(i, plots[i]);
+                    // console.log(i, plots[i]);
                     if (plots[i].farmInformation.plotNumber === objectToPush.plot) {
                         objectToPush.MHCode = plots[i].farmInformation.MHCode;
                         break;
@@ -114,7 +114,7 @@ router.post("/", async (req, res) => {
             .catch((err) => {
                 res.status(400).send(err.message);
             });
-        console.log("object", objectToPush);
+        //console.log("object", objectToPush);
         // to insert data in daily diaries
         fetch(process.env.API_URL + "/dailyDiary", {
             method: 'POST',
@@ -134,11 +134,11 @@ router.post("/", async (req, res) => {
                 }
             })
             .then((result) => {
-                console.log("res", result);
+                //console.log("res", result);
                 res.status(200).send(result);
             })
             .catch((err) => {
-                console.log("err", err);
+                //console.log("err", err);
                 res.status(400).send(err.message);
             });
     } else {
@@ -205,7 +205,7 @@ router.post("/", async (req, res) => {
                                                 res.status(200).send(resultObject);
                                         })
                                         .catch((err) => {
-                                            console.log("err", err);
+                                            //console.log("err", err);
                                             if (i == result.length - 1)
                                                 res.status(400).send(err.message);
                                         });
@@ -237,7 +237,7 @@ router.post("/", async (req, res) => {
                                 if (result.status === 200)
                                     return result.json();
                                 else {
-                                    console.log(result.text().then(r => console.log(r)));
+                                    //console.log(result.text().then(r => console.log(r)));
                                     throw new Error("Error in inserting daily Diary");
                                 }
                             })

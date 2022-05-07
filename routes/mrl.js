@@ -18,11 +18,11 @@ router.get("", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log(data.data);
+            //console.log(data.data);
             res.status(200).send(data.data);
         })
         .catch((err) => {
-            console.log(err);
+            //console.log(err);
             res.status(400).send({ message: err.message });
         });
 });
@@ -37,11 +37,11 @@ router.get("/data/:mrlId", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log(data.data);
+            //console.log(data.data);
             res.status(200).send(data.data);
         })
         .catch((err) => {
-            console.log(err);
+            //console.log(err);
             res.status(400).send({ message: err.message });
         });
 });
@@ -57,11 +57,11 @@ router.get("/MHCode/:MHCode", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log(data.data);
+            //console.log(data.data);
             res.status(200).send(data.data);
         })
         .catch((err) => {
-            console.log(err);
+            //console.log(err);
             res.status(400).send({ message: err.message });
         });
 });
@@ -76,11 +76,11 @@ router.get("/sampleNumber/:sampleNumber", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log(data.data);
+            //console.log(data.data);
             res.status(200).send(data.data);
         })
         .catch((err) => {
-            console.log(err);
+            //console.log(err);
             res.status(400).send({ message: err.message });
         });
 });
@@ -97,11 +97,11 @@ router.post("/", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log(data.data);
+            //console.log(data.data);
             res.status(200).send(data.data);
         })
         .catch((err) => {
-            console.log(err);
+            //console.log(err);
             res.status(400).send({ message: err.message });
         });
 });
@@ -209,11 +209,11 @@ router.post("/uploadCSV", middleware, (req, res) => {
                         }
                     })
                         .then((data) => {
-                            console.log(data.data);
+                            //console.log(data.data);
                             res.status(200).send(data.data);
                         })
                         .catch((err) => {
-                            console.log(err);
+                            //console.log(err);
                             if (err.response && err.response.data && err.response.data.message) {
                                 res.status(400).send({ message: err.response.data.message });
                             } else {
@@ -223,11 +223,11 @@ router.post("/uploadCSV", middleware, (req, res) => {
 
                 });
         } catch (err) {
-            console.log(err);
+            //console.log(err);
             res.status(400).send({ message: err.message });
         }
     } else {
-        console.log("No file uploaded");
+        //console.log("No file uploaded");
         res.status(400).send({ message: "File not uploaded" });
     }
 });
@@ -242,11 +242,11 @@ router.post("/delete/:mrlId", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log(data.data);
+            //console.log(data.data);
             res.status(200).send(data.data);
         })
         .catch((err) => {
-            console.log(err);
+            //console.log(err);
             res.status(400).send({ message: err.message });
         });
 });
@@ -269,11 +269,11 @@ router.post("/delete/MHCode/:MHCode/:year?", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log(data.data);
+            //console.log(data.data);
             res.status(200).send(data.data);
         })
         .catch((err) => {
-            console.log(err);
+            //console.log(err);
             res.status(400).send({ message: err.message });
         });
 });
@@ -287,11 +287,11 @@ router.get("/approvedChemicals", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log(data.data);
+            //console.log(data.data);
             res.status(200).send(data.data);
         })
         .catch((err) => {
-            console.log(err);
+            //console.log(err);
             res.status(400).send({ message: err.message });
         });
 });
@@ -324,20 +324,20 @@ router.post("/uploadApprovedChemicals", middleware, (req, res) => {
                         }
                     })
                         .then((data) => {
-                            console.log(data.data);
+                            //console.log(data.data);
                             res.status(200).send(data.data);
                         })
                         .catch((err) => {
-                            console.log(err);
+                            //console.log(err);
                             res.status(400).send({ message: err.message });
                         });
                 })
         } catch (err) {
-            console.log(err);
+            //console.log(err);
             res.status(400).send({ message: err.message });
         }
     } else {
-        console.log("No file uploaded");
+        //console.log("No file uploaded");
         res.status(400).send({ message: "File not uploaded" });
     }
 });
@@ -353,11 +353,11 @@ router.get("/bannedChemicals", middleware, (req, res) => {
         }
     })
         .then((data) => {
-            console.log(data.data);
+            //console.log(data.data);
             res.status(200).send(data.data);
         })
         .catch((err) => {
-            console.log(err);
+            //console.log(err);
             res.status(400).send({ message: err.message });
         });
 });
@@ -402,20 +402,20 @@ router.post("/uploadBannedChemicals", middleware, (req, res) => {
                         }
                     })
                         .then((data) => {
-                            console.log(data.data);
+                            //console.log(data.data);
                             res.status(200).send(data.data);
                         })
                         .catch((err) => {
-                            console.log(err);
+                            //console.log(err);
                             res.status(400).send({ message: err.message });
                         });
                 })
         } catch (err) {
-            console.log(err);
+            //console.log(err);
             res.status(400).send({ message: err.message });
         }
     } else {
-        console.log("No file uploaded");
+        //console.log("No file uploaded");
         res.status(400).send({ message: "File not uploaded" });
     }
 });

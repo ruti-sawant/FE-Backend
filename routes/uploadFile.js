@@ -35,7 +35,7 @@ router.post("/", middleware, async (req, res) => {
             id: result.id
         });
     } else {
-        console.log("No file uploaded");
+        //console.log("No file uploaded");
         res.status(400).send({ message: "No file uploaded" });
     }
 });
@@ -50,15 +50,15 @@ router.post("/:folderName", middleware, async (req, res) => {
             id: result.id
         });
     } else {
-        console.log("No file uploaded");
+        //console.log("No file uploaded");
         res.status(400).send({ message: "No file uploaded" });
     }
 });
 
 //to delete file from drive.
 router.delete("/", middleware, async (req, res) => {
-    console.log(req.body);
-    console.log(req.body.id);
+    //console.log(req.body);
+    //console.log(req.body.id);
     await deleteFile(req.body.id);
     res.status(200).send({ data: "deleted" });
 });
@@ -75,9 +75,9 @@ async function deleteFile(fileId) {
     })
         .then((res) => {
             // console.log(res);
-            console.log("file deleted ", fileId);
+            //console.log("file deleted ", fileId);
         }).catch((err) => {
-            console.log(err);
+            //console.log(err);
         })
 }
 
@@ -103,7 +103,7 @@ async function uploadFile(fileName, mimeType, data, folderName) {
         //generate and send public url.
         return await generatePublicUrl(responce.data.id);
     } catch (err) {
-        console.log(err.message);
+        //console.log(err.message);
     }
 }
 
@@ -124,6 +124,6 @@ async function generatePublicUrl(id) {
         });
         return result.data;
     } catch (err) {
-        console.log(err);
+        //console.log(err);
     }
 }

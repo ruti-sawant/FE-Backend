@@ -160,7 +160,7 @@ router.post("/", middleware, (req, res) => {
                                     //over each MHCode from frontend.
                                     for (let x = 0; x < MHCodesArray.length; x++) {
                                         const MHCode = MHCodesArray[x];
-                                        console.log(MHCode);
+                                        //console.log(MHCode);
                                         const diariesForFarmer = [];
                                         //if farmer is found from database data.
                                         if (farmerMapping.has(MHCode)) {
@@ -173,7 +173,7 @@ router.post("/", middleware, (req, res) => {
                                                 // to get Difference in date using Date.parse() and adding number of seconds to it to get expected date.
 
                                                 const newDate = new Date(Date.parse(startDate) + (Number(curatedDiaries[i].day) * 86400000));
-                                                console.log(startDate, newDate, curatedDiaries[i].day);
+                                                //console.log(startDate, newDate, curatedDiaries[i].day);
                                                 //assign new calculated date to proposed date.
                                                 value.proposedDate = newDate.toISOString();
                                                 //create diaryObject from two data from csv and from database api.
@@ -193,35 +193,35 @@ router.post("/", middleware, (req, res) => {
                                             })
                                                 .then((data) => {
                                                     // res.status(200).send(data.data);
-                                                    console.log(data.data);
-                                                    console.log(MHCode, "Completed inside");
+                                                    //console.log(data.data);
+                                                    //console.log(MHCode, "Completed inside");
                                                 })
                                                 .catch((err) => {
                                                     res.status(400).send({ message: err.message });
                                                 });
-                                            console.log(MHCode, "Completed");
+                                            //console.log(MHCode, "Completed");
                                             completedMHCodes.push(MHCode);
                                         }
                                     }
-                                    console.log(completedMHCodes);
+                                    //console.log(completedMHCodes);
                                     res.status(200).send({ message: "All Daily Diaries inserted " + completedMHCodes.join(" , ") });
                                 })
                                 .catch((err) => {
-                                    console.log("seasonalData", err);
+                                    //console.log("seasonalData", err);
                                     res.status(400).send({ message: err.message });
                                 });
                         })
                         .catch((err) => {
-                            console.log("farmer", err);
+                            //console.log("farmer", err);
                             res.status(400).send({ message: err.message });
                         });
                 });
         } catch (err) {
-            console.log(err);
+            //console.log(err);
             res.status(400).send({ message: err.message });
         }
     } else {
-        console.log("No file uploaded");
+        //console.log("No file uploaded");
         res.status(400).send({ message: "File not uploaded" });
     }
 });
@@ -244,7 +244,7 @@ function getAllFarmers() {
 
         })
         .catch((err) => {
-            console.log("err", err);
+            //console.log("err", err);
             // res.status(400).send({ message: err.message });
         });
 
