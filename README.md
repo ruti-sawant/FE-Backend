@@ -8,3 +8,4 @@ This server acts as data provider for react frontend applications and also provi
 
 This Project has one folder called routes which contains files to connect to various routes.
 <i>middleware.js</i> file contains middleware that should be attached to every header to handle CORS policy.
+<a href="http://162.240.33.255:4000/"> http://162.240.33.255:4000/</a> is the route to connect to API.
