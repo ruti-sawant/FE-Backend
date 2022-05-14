@@ -43,8 +43,8 @@ router.get("/", middleware, (req, res) => {
             httpOnly: true,
             //time for 3 hours
             maxAge: 1000 * 60 * 60 * 3,
-            secure: true,
-            sameSite: 'none'
+            // secure: true,
+            // sameSite: 'none'
         });
         res.status(200).send({
             loggedIn: true, data
@@ -123,8 +123,8 @@ router.post("/", middleware, (req, res) => {
                     httpOnly: true,
                     //time for 3 hours
                     maxAge: 1000 * 60 * 60 * 3,
-                    secure: true,
-                    sameSite: 'none'
+                    // secure: true,
+                    // sameSite: 'none'
                 });
                 res.status(200).send(data.data);
             } else {

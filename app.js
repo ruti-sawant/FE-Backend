@@ -45,7 +45,7 @@ app.use("/admins", admins);
 app.use("/dailyDiaryAutomation", dailyDiaryAutomation);
 app.use("/login", login);
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 4000;
 
 app.listen(port, () => {
   console.log("Server started on port ", port);
@@ -74,8 +74,8 @@ app.get("/logout", middleware, (req, res) => {
   //code to delete cookie
   res.cookie(process.env.COOKIE_NAME, '', {
     httpOnly: true,
-    secure: true,
-    sameSite: 'none',
+    // secure: true,
+    // sameSite: 'none',
     expires: new Date(0)
   });
   res.status(200).send({ message: "Logged Out" });
