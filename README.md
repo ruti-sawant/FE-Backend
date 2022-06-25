@@ -1,9 +1,9 @@
 # FE-Backend
 
-Other Links:
-<a href="https://github.com/ruti-sawant/FE-Backend">Backend</a>
-<a href="https://github.com/ruti-sawant/FE-Database">Database</a>
-<a href="https://github.com/Harshal-9/FreshExpress-Dashboard">Frontend</a>
+Other Links:<br>
+<a href="https://github.com/ruti-sawant/FE-Backend">Backend</a><br>
+<a href="https://github.com/ruti-sawant/FE-Database">Database</a><br>
+<a href="https://github.com/Harshal-9/FreshExpress-Dashboard">Frontend</a><br>
 
 
 
