@@ -1,5 +1,13 @@
 # FE-Backend
 
+Other Links:
+<a href="https://github.com/ruti-sawant/FE-Backend">Backend</a>
+<a href="https://github.com/ruti-sawant/FE-Database">Database</a>
+<a href="https://github.com/Harshal-9/FreshExpress-Dashboard">Frontend</a>
+
+
+
+
 This is repository of backend API for Farmer Connect Web App.<br>
 This server works as data provider for web app.<br>
 In this project authentication is done through cookie and username and password which must be passed in header.<br>
